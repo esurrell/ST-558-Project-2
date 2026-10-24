@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Emily Surrell">
+<meta name="dcterms.date" content="2026-10-28">
+
+<title>Data Investigation</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="Data Investigation_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Data Investigation_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="Data Investigation_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="Data Investigation_files/libs/quarto-html/popper.min.js"></script>
+<script src="Data Investigation_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="Data Investigation_files/libs/quarto-html/anchor.min.js"></script>
+<link href="Data Investigation_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Data Investigation_files/libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="Data Investigation_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="Data Investigation_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="Data Investigation_files/libs/bootstrap/bootstrap-efbb37e9afcc02144ebbc7afd12a776f.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Data Investigation</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Emily Surrell </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">October 28, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introduction-and-data-preparation" class="level2">
+<h2 class="anchored" data-anchor-id="introduction-and-data-preparation">Introduction and Data Preparation</h2>
+<p>For this project, we will be looking at CDC data about Assisted Reproductive Technology (ART). This data provides information about fertility clinics across the United States in the years 2020-2022. Links to download each year of the data are provided below:</p>
+<ul>
+<li><a href="https://data.cdc.gov/Assisted-Reproductive-Technology-ART-/2020-Final-Assisted-Reproductive-Technology-ART-Se/92ri-yjps/about_data">2020 data</a></li>
+<li><a href="https://data.cdc.gov/Assisted-Reproductive-Technology-ART-/2021-Final-Assisted-Reproductive-Technology-ART-Se/ui6g-vumy/about_data">2021 data</a></li>
+<li><a href="https://data.cdc.gov/Assisted-Reproductive-Technology-ART-/2022-Final-Assisted-Reproductive-Technology-ART-Se/ix4g-rt8v/about_data">2022 data</a></li>
+</ul>
+<section id="libraries" class="level3">
+<h3 class="anchored" data-anchor-id="libraries">Libraries</h3>
+<p>First, load in all libraries that are needed for this data investigation.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.2.1     ✔ readr     2.2.0
+✔ forcats   1.0.1     ✔ stringr   1.6.0
+✔ ggplot2   4.0.3     ✔ tibble    3.3.1
+✔ lubridate 1.9.5     ✔ tidyr     1.3.2
+✔ purrr     1.2.2     
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="read-in-data" class="level3">
+<h3 class="anchored" data-anchor-id="read-in-data">Read in Data</h3>
+<p>Read in each year of data and stack together into one data set.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>rawdata2020 <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/2020_Final_Assisted_Reproductive_Technology_(ART)_Services_and_Profiles_20261024.csv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 5416 Columns: 17
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (15): LocationAbbr, LocationDesc, FacilityName, MedicalDirector, Address...
+dbl  (1): Year
+num  (1): ClinicId
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>rawdata2021 <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/2021_Final_Assisted_Reproductive_Technology_(ART)_Services_and_Profiles_20261024.csv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 5450 Columns: 17
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (15): LocationAbbr, LocationDesc, FacilityName, MedicalDirector, Address...
+dbl  (1): Year
+num  (1): ClinicId
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>rawdata2022 <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/2022_Final_Assisted_Reproductive_Technology_(ART)_Services_and_Profiles_20261024.csv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 6146 Columns: 17
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (15): LocationAbbr, LocationDesc, FacilityName, MedicalDirector, Address...
+dbl  (1): Year
+num  (1): ClinicId
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>rawdata <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(rawdata2020, rawdata2021, rawdata2022)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co">#view data</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>rawdata</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 17,012 × 17
+    Year LocationAbbr LocationDesc FacilityName    MedicalDirector Address City 
+   &lt;dbl&gt; &lt;chr&gt;        &lt;chr&gt;        &lt;chr&gt;           &lt;chr&gt;           &lt;chr&gt;   &lt;chr&gt;
+ 1  2020 &lt;NA&gt;         Other        National        None            None    None 
+ 2  2020 TX           Texas        IVFMD-Arlington Renju  Raj, MD  600 W.… Arli…
+ 3  2020 &lt;NA&gt;         Other        National        None            None    None 
+ 4  2020 &lt;NA&gt;         National     National        None            None    None 
+ 5  2020 &lt;NA&gt;         National     National        None            None    None 
+ 6  2020 NY           New York     Neway Medical   Ralf  Zimmerma… 123 W.… New …
+ 7  2020 AK           Alaska       Katie Ostrom M… Gary  Levy, MD  205 W.… Homer
+ 8  2020 NY           New York     CCRM New York   Janet M. Choi,… 810 Se… New …
+ 9  2020 &lt;NA&gt;         National     National        None            None    None 
+10  2020 &lt;NA&gt;         Other        National        None            None    None 
+# ℹ 17,002 more rows
+# ℹ 10 more variables: Zipcode &lt;chr&gt;, Phone &lt;chr&gt;, `Clinic Status` &lt;chr&gt;,
+#   Topic &lt;chr&gt;, SubTopic &lt;chr&gt;, Data_Value &lt;chr&gt;, ClinicId &lt;dbl&gt;,
+#   TopicId &lt;chr&gt;, SubTopicId &lt;chr&gt;, Geolocation &lt;chr&gt;</code></pre>
+</div>
+</div>
+</section>
+<section id="data-cleaning" class="level3">
+<h3 class="anchored" data-anchor-id="data-cleaning">Data Cleaning</h3>
+<p>Validate that the variable <code>Topic</code> is “Clinic Services &amp; Profile” and the variable <code>TopicId</code> is “TOP01” for all 17,012 records in the raw data, so these variables can be dropped.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(rawdata<span class="sc">$</span>Topic)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Clinic Services &amp; Profile 
+                    17012 </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(rawdata<span class="sc">$</span>TopicId)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+TOP01 
+17012 </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>rawdata <span class="sc">|&gt;</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(<span class="st">"Topic"</span>, <span class="st">"TopicId"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 17,012 × 15
+    Year LocationAbbr LocationDesc FacilityName    MedicalDirector Address City 
+   &lt;dbl&gt; &lt;chr&gt;        &lt;chr&gt;        &lt;chr&gt;           &lt;chr&gt;           &lt;chr&gt;   &lt;chr&gt;
+ 1  2020 &lt;NA&gt;         Other        National        None            None    None 
+ 2  2020 TX           Texas        IVFMD-Arlington Renju  Raj, MD  600 W.… Arli…
+ 3  2020 &lt;NA&gt;         Other        National        None            None    None 
+ 4  2020 &lt;NA&gt;         National     National        None            None    None 
+ 5  2020 &lt;NA&gt;         National     National        None            None    None 
+ 6  2020 NY           New York     Neway Medical   Ralf  Zimmerma… 123 W.… New …
+ 7  2020 AK           Alaska       Katie Ostrom M… Gary  Levy, MD  205 W.… Homer
+ 8  2020 NY           New York     CCRM New York   Janet M. Choi,… 810 Se… New …
+ 9  2020 &lt;NA&gt;         National     National        None            None    None 
+10  2020 &lt;NA&gt;         Other        National        None            None    None 
+# ℹ 17,002 more rows
+# ℹ 8 more variables: Zipcode &lt;chr&gt;, Phone &lt;chr&gt;, `Clinic Status` &lt;chr&gt;,
+#   SubTopic &lt;chr&gt;, Data_Value &lt;chr&gt;, ClinicId &lt;dbl&gt;, SubTopicId &lt;chr&gt;,
+#   Geolocation &lt;chr&gt;</code></pre>
+</div>
+</div>
+<p>Remove summary rows from the data that do not correspond to a specific clinic.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co">#view records to drop</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>rawdata <span class="sc">|&gt;</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(<span class="st">"Topic"</span>, <span class="st">"TopicId"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">is.na</span>(LocationAbbr))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 56 × 15
+    Year LocationAbbr LocationDesc FacilityName MedicalDirector Address City 
+   &lt;dbl&gt; &lt;chr&gt;        &lt;chr&gt;        &lt;chr&gt;        &lt;chr&gt;           &lt;chr&gt;   &lt;chr&gt;
+ 1  2020 &lt;NA&gt;         Other        National     None            None    None 
+ 2  2020 &lt;NA&gt;         Other        National     None            None    None 
+ 3  2020 &lt;NA&gt;         National     National     None            None    None 
+ 4  2020 &lt;NA&gt;         National     National     None            None    None 
+ 5  2020 &lt;NA&gt;         National     National     None            None    None 
+ 6  2020 &lt;NA&gt;         Other        National     None            None    None 
+ 7  2020 &lt;NA&gt;         Other        National     None            None    None 
+ 8  2020 &lt;NA&gt;         Other        National     None            None    None 
+ 9  2020 &lt;NA&gt;         National     National     None            None    None 
+10  2020 &lt;NA&gt;         National     National     None            None    None 
+# ℹ 46 more rows
+# ℹ 8 more variables: Zipcode &lt;chr&gt;, Phone &lt;chr&gt;, `Clinic Status` &lt;chr&gt;,
+#   SubTopic &lt;chr&gt;, Data_Value &lt;chr&gt;, ClinicId &lt;dbl&gt;, SubTopicId &lt;chr&gt;,
+#   Geolocation &lt;chr&gt;</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co">#view records to keep</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>rawdata <span class="sc">|&gt;</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(<span class="st">"Topic"</span>, <span class="st">"TopicId"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(LocationAbbr))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 16,956 × 15
+    Year LocationAbbr LocationDesc FacilityName    MedicalDirector Address City 
+   &lt;dbl&gt; &lt;chr&gt;        &lt;chr&gt;        &lt;chr&gt;           &lt;chr&gt;           &lt;chr&gt;   &lt;chr&gt;
+ 1  2020 TX           Texas        IVFMD-Arlington Renju  Raj, MD  600 W.… Arli…
+ 2  2020 NY           New York     Neway Medical   Ralf  Zimmerma… 123 W.… New …
+ 3  2020 AK           Alaska       Katie Ostrom M… Gary  Levy, MD  205 W.… Homer
+ 4  2020 NY           New York     CCRM New York   Janet M. Choi,… 810 Se… New …
+ 5  2020 NJ           New Jersey   Women's Fertil… Philip R. Leso… 106 Gr… Engl…
+ 6  2020 UT           Utah         Utah Center fo… Megan  Link, MD 675 Ar… Salt…
+ 7  2020 CO           Colorado     Rocky Mountain… Kevin E. Bachu… 1080 E… Fort…
+ 8  2020 TX           Texas        Family Fertili… William E. Gib… Texas … Hous…
+ 9  2020 TX           Texas        Fertility Spec… Jerald S. Gold… 5757 W… Fris…
+10  2020 MS           Mississippi  Mississippi Re… Randall S. Hin… 2500 L… Flow…
+# ℹ 16,946 more rows
+# ℹ 8 more variables: Zipcode &lt;chr&gt;, Phone &lt;chr&gt;, `Clinic Status` &lt;chr&gt;,
+#   SubTopic &lt;chr&gt;, Data_Value &lt;chr&gt;, ClinicId &lt;dbl&gt;, SubTopicId &lt;chr&gt;,
+#   Geolocation &lt;chr&gt;</code></pre>
+</div>
+</div>
+<p>Replace * values with <em>NA()</em>.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>rawdata <span class="sc">|&gt;</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(<span class="st">"Topic"</span>, <span class="st">"TopicId"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(LocationAbbr)) <span class="sc">|&gt;</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Data_Value <span class="sc">==</span> <span class="st">"*"</span>) <span class="sc">|&gt;</span> <span class="co">#for testing</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Data_Value =</span> <span class="fu">replace_values</span>(Data_Value, <span class="at">from =</span> <span class="st">"*"</span>, <span class="at">to =</span> <span class="cn">NA</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">c</span>(<span class="st">"SubTopic"</span>, <span class="st">"Data_Value"</span>)) <span class="co">#for testing</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 258 × 2
+   SubTopic                      Data_Value
+   &lt;chr&gt;                         &lt;chr&gt;     
+ 1 Fertility preservation cycles &lt;NA&gt;      
+ 2 Fertility preservation cycles &lt;NA&gt;      
+ 3 Fertility preservation cycles &lt;NA&gt;      
+ 4 Fertility preservation cycles &lt;NA&gt;      
+ 5 Fertility preservation cycles &lt;NA&gt;      
+ 6 Fertility preservation cycles &lt;NA&gt;      
+ 7 Fertility preservation cycles &lt;NA&gt;      
+ 8 Fertility preservation cycles &lt;NA&gt;      
+ 9 Fertility preservation cycles &lt;NA&gt;      
+10 Fertility preservation cycles &lt;NA&gt;      
+# ℹ 248 more rows</code></pre>
+</div>
+</div>
+<p>Save the cleaned data up to this point (still long) and save a list of values for <code>SubTopic</code> and <code>SubTopicId</code>.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>longdata <span class="ot">&lt;-</span> rawdata <span class="sc">|&gt;</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(<span class="st">"Topic"</span>, <span class="st">"TopicId"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(LocationAbbr)) <span class="sc">|&gt;</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Data_Value =</span> <span class="fu">replace_values</span>(Data_Value, <span class="at">from =</span> <span class="st">"*"</span>, <span class="at">to =</span> <span class="cn">NA</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(SubTopicId)</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>subtopics <span class="ot">&lt;-</span> longdata <span class="sc">|&gt;</span></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(SubTopic, SubTopicId) <span class="sc">|&gt;</span></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(SubTopicId)</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a><span class="co">#view subtopics</span></span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>subtopics</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 12 × 2
+   SubTopic                         SubTopicId
+   &lt;chr&gt;                            &lt;chr&gt;     
+ 1 Total cycles                     ST01      
+ 2 Fertility preservation cycles    ST02      
+ 3 Pregnancies                      ST03      
+ 4 Deliveries                       ST04      
+ 5 Total infants born               ST05      
+ 6 Donor egg services               ST09      
+ 7 Donated embryo services          ST10      
+ 8 Embryo cryopreservation services ST11      
+ 9 Egg cryopreservation services    ST12      
+10 Gestational carrier services     ST13      
+11 SART member                      ST14      
+12 Verified lab accreditation       ST15      </code></pre>
+</div>
+</div>
+<p>Turn the data wide by subtopic.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>longdata <span class="sc">|&gt;</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(<span class="st">"SubTopic"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> SubTopicId, <span class="at">values_from =</span> Data_Value) <span class="sc">|&gt;</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">starts_with</span>(<span class="st">"ST"</span>)) <span class="co">#for testing</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1,413 × 12
+   ST01  ST02  ST03  ST04  ST05  ST09  ST10  ST11  ST12  ST13  ST14  ST15 
+   &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;
+ 1 376   11    107   86    94    Yes   No    Yes   Yes   Yes   Yes   Yes  
+ 2 420   &lt;NA&gt;  123   97    98    Yes   Yes   Yes   Yes   Yes   No    Yes  
+ 3 169   9     33    24    27    Yes   Yes   Yes   Yes   Yes   Yes   Yes  
+ 4 740   19    184   159   167   No    No    Yes   Yes   No    Yes   Yes  
+ 5 140   &lt;NA&gt;  47    35    38    No    No    Yes   Yes   No    Yes   Yes  
+ 6 31    0     &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;  No    No    Yes   Yes   No    Yes   Yes  
+ 7 71    0     22    20    22    Yes   Yes   Yes   Yes   Yes   No    No   
+ 8 354   13    105   93    94    Yes   No    Yes   Yes   Yes   Yes   Yes  
+ 9 2010  148   522   446   453   Yes   No    Yes   Yes   Yes   Yes   Yes  
+10 44    &lt;NA&gt;  24    19    26    Yes   No    Yes   Yes   No    No    Yes  
+# ℹ 1,403 more rows</code></pre>
+</div>
+</div>
+<p>Convert variables <code>ST01</code> through <code>ST05</code> to numeric and store results.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>CDC <span class="ot">&lt;-</span> longdata <span class="sc">|&gt;</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(<span class="st">"SubTopic"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> SubTopicId, <span class="at">values_from =</span> Data_Value) <span class="sc">|&gt;</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(ST01<span class="sc">:</span>ST05, as.numeric))</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="co">#view results</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>CDC</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1,413 × 24
+    Year LocationAbbr LocationDesc  FacilityName   MedicalDirector Address City 
+   &lt;dbl&gt; &lt;chr&gt;        &lt;chr&gt;         &lt;chr&gt;          &lt;chr&gt;           &lt;chr&gt;   &lt;chr&gt;
+ 1  2020 FL           Florida       Florida Ferti… Mark D. Sanche… 2454 N… Clea…
+ 2  2020 WA           Washington    Overlake Repr… Kevin M. Johns… 11232 … Bell…
+ 3  2020 CO           Colorado      Colorado Repr… Susan  Trout, … 4600 E… Denv…
+ 4  2020 NY           New York      Boston IVF, T… Sonia  Elguero… 399 Al… Loud…
+ 5  2020 TX           Texas         Brooke Army M… Belinda J. Yau… Depart… Fort…
+ 6  2020 IL           Illinois      Carle Foundat… Nancy  Fay, MD  1818 E… Urba…
+ 7  2020 CA           California    The Fertility… Edward J. Rami… 9833 B… Mont…
+ 8  2020 TX           Texas         Austin Fertil… Kenneth K. Mog… 2200 P… Aust…
+ 9  2020 NJ           New Jersey    Institute for… Margaret G. Ga… 94 Old… Livi…
+10  2020 WV           West Virginia Cabell Huntin… William N. Bur… 1600 M… Hunt…
+# ℹ 1,403 more rows
+# ℹ 17 more variables: Zipcode &lt;chr&gt;, Phone &lt;chr&gt;, `Clinic Status` &lt;chr&gt;,
+#   ClinicId &lt;dbl&gt;, Geolocation &lt;chr&gt;, ST01 &lt;dbl&gt;, ST02 &lt;dbl&gt;, ST03 &lt;dbl&gt;,
+#   ST04 &lt;dbl&gt;, ST05 &lt;dbl&gt;, ST09 &lt;chr&gt;, ST10 &lt;chr&gt;, ST11 &lt;chr&gt;, ST12 &lt;chr&gt;,
+#   ST13 &lt;chr&gt;, ST14 &lt;chr&gt;, ST15 &lt;chr&gt;</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>CDC <span class="sc">|&gt;</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">starts_with</span>(<span class="st">"ST"</span>)) <span class="co">#for testing</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1,413 × 12
+    ST01  ST02  ST03  ST04  ST05 ST09  ST10  ST11  ST12  ST13  ST14  ST15 
+   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;
+ 1   376    11   107    86    94 Yes   No    Yes   Yes   Yes   Yes   Yes  
+ 2   420    NA   123    97    98 Yes   Yes   Yes   Yes   Yes   No    Yes  
+ 3   169     9    33    24    27 Yes   Yes   Yes   Yes   Yes   Yes   Yes  
+ 4   740    19   184   159   167 No    No    Yes   Yes   No    Yes   Yes  
+ 5   140    NA    47    35    38 No    No    Yes   Yes   No    Yes   Yes  
+ 6    31     0    NA    NA    NA No    No    Yes   Yes   No    Yes   Yes  
+ 7    71     0    22    20    22 Yes   Yes   Yes   Yes   Yes   No    No   
+ 8   354    13   105    93    94 Yes   No    Yes   Yes   Yes   Yes   Yes  
+ 9  2010   148   522   446   453 Yes   No    Yes   Yes   Yes   Yes   Yes  
+10    44    NA    24    19    26 Yes   No    Yes   Yes   No    No    Yes  
+# ℹ 1,403 more rows</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="data-investigation" class="level2">
+<h2 class="anchored" data-anchor-id="data-investigation">Data Investigation</h2>
+<section id="one-way-contingency-tables" class="level3">
+<h3 class="anchored" data-anchor-id="one-way-contingency-tables">One-Way Contingency Tables</h3>
+</section>
+<section id="two-way-contingency-tables" class="level3">
+<h3 class="anchored" data-anchor-id="two-way-contingency-tables">Two-Way Contingency Tables</h3>
+</section>
+<section id="numerical-summaries" class="level3">
+<h3 class="anchored" data-anchor-id="numerical-summaries">Numerical Summaries</h3>
+<p>Numerical summaries (means, medians, sds, etc.) for quantitative variables at levels of categorical variables.</p>
+</section>
+<section id="plot-1" class="level3">
+<h3 class="anchored" data-anchor-id="plot-1">Plot 1</h3>
+</section>
+<section id="plot-2" class="level3">
+<h3 class="anchored" data-anchor-id="plot-2">Plot 2</h3>
+</section>
+<section id="plot-3" class="level3">
+<h3 class="anchored" data-anchor-id="plot-3">Plot 3</h3>
+</section>
+<section id="plot-4" class="level3">
+<h3 class="anchored" data-anchor-id="plot-4">Plot 4</h3>
+</section>
+<section id="plot-5" class="level3">
+<h3 class="anchored" data-anchor-id="plot-5">Plot 5</h3>
+</section>
+<section id="plot-6" class="level3">
+<h3 class="anchored" data-anchor-id="plot-6">Plot 6</h3>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

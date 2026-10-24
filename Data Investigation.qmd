@@ -1,0 +1,171 @@
+---
+title: "Data Investigation"
+author: "Emily Surrell"
+date: 10/28/2026
+format: html
+---
+
+## Introduction and Data Preparation
+
+For this project, we will be looking at CDC data about Assisted Reproductive Technology (ART). This data provides information about fertility clinics across the United States in the years 2020-2022. Links to download each year of the data are provided below:
+
+- [2020 data](https://data.cdc.gov/Assisted-Reproductive-Technology-ART-/2020-Final-Assisted-Reproductive-Technology-ART-Se/92ri-yjps/about_data)
+- [2021 data](https://data.cdc.gov/Assisted-Reproductive-Technology-ART-/2021-Final-Assisted-Reproductive-Technology-ART-Se/ui6g-vumy/about_data)
+- [2022 data](https://data.cdc.gov/Assisted-Reproductive-Technology-ART-/2022-Final-Assisted-Reproductive-Technology-ART-Se/ix4g-rt8v/about_data)
+
+### Libraries
+
+First, load in all libraries that are needed for this data investigation.
+
+```{r}
+library(tidyverse)
+library(dplyr)
+```
+
+### Read in Data
+
+Read in each year of data and stack together into one data set.
+
+```{r}
+rawdata2020 <- read_csv("data/2020_Final_Assisted_Reproductive_Technology_(ART)_Services_and_Profiles_20261024.csv")
+
+rawdata2021 <- read_csv("data/2021_Final_Assisted_Reproductive_Technology_(ART)_Services_and_Profiles_20261024.csv")
+
+rawdata2022 <- read_csv("data/2022_Final_Assisted_Reproductive_Technology_(ART)_Services_and_Profiles_20261024.csv")
+
+rawdata <- bind_rows(rawdata2020, rawdata2021, rawdata2022)
+
+#view data
+rawdata
+```
+
+### Data Cleaning
+
+Validate that the variable `Topic` is "Clinic Services & Profile" and the variable `TopicId` is "TOP01" for all 17,012 records in the raw data, so these variables can be dropped.
+
+```{r}
+table(rawdata$Topic)
+table(rawdata$TopicId)
+
+rawdata |>
+  select(-c("Topic", "TopicId"))
+```
+
+Remove summary rows from the data that do not correspond to a specific clinic.
+
+```{r}
+#view records to drop
+rawdata |>
+  select(-c("Topic", "TopicId")) |>
+  filter(is.na(LocationAbbr))
+
+#view records to keep
+rawdata |>
+  select(-c("Topic", "TopicId")) |>
+  filter(!is.na(LocationAbbr))
+```
+
+Replace \* values with *NA()*.
+
+```{r}
+rawdata |>
+  select(-c("Topic", "TopicId")) |>
+  filter(!is.na(LocationAbbr)) |>
+  filter(Data_Value == "*") |> #for testing
+  mutate(Data_Value = replace_values(Data_Value, from = "*", to = NA)) |>
+  select(c("SubTopic", "Data_Value")) #for testing
+```
+
+Save the cleaned data up to this point (still long) and save a list of values for `SubTopic` and `SubTopicId`.
+
+```{r}
+longdata <- rawdata |>
+  select(-c("Topic", "TopicId")) |>
+  filter(!is.na(LocationAbbr)) |>
+  mutate(Data_Value = replace_values(Data_Value, from = "*", to = NA)) |>
+  arrange(SubTopicId)
+  
+subtopics <- longdata |>
+  distinct(SubTopic, SubTopicId) |>
+  arrange(SubTopicId)
+
+#view subtopics
+subtopics
+```
+
+Turn the data wide by subtopic.
+
+```{r}
+longdata |>
+  select(-c("SubTopic")) |>
+  pivot_wider(names_from = SubTopicId, values_from = Data_Value) |>
+  select(starts_with("ST")) #for testing
+```
+Convert variables `ST01` through `ST05` to numeric and store results.
+
+```{r}
+CDC <- longdata |>
+  select(-c("SubTopic")) |>
+  pivot_wider(names_from = SubTopicId, values_from = Data_Value) |>
+  mutate(across(ST01:ST05, as.numeric))
+
+#view results
+CDC
+
+CDC |>
+  select(starts_with("ST")) #for testing
+```
+
+## Data Investigation
+
+### One-Way Contingency Tables
+
+```{r}
+
+```
+
+### Two-Way Contingency Tables
+
+```{r}
+
+```
+
+### Numerical Summaries
+
+Numerical summaries (means, medians, sds, etc.) for quantitative variables at levels of categorical variables.
+
+### Plot 1
+
+```{r}
+
+```
+
+### Plot 2
+
+```{r}
+
+```
+
+### Plot 3
+
+```{r}
+
+```
+
+### Plot 4
+
+```{r}
+
+```
+
+### Plot 5
+
+```{r}
+
+```
+
+### Plot 6
+
+```{r}
+
+```
