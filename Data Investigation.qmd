@@ -65,7 +65,7 @@ rawdata |>
   filter(!is.na(LocationAbbr))
 ```
 
-Replace \* values with *NA()*.
+Replace \* values with *NA*.
 
 ```{r}
 rawdata |>
@@ -76,7 +76,7 @@ rawdata |>
   select(c("SubTopic", "Data_Value")) #for testing
 ```
 
-Save the cleaned data up to this point (still long) and save a list of values for `SubTopic` and `SubTopicId`.
+Save the cleaned data up to this point (still long).
 
 ```{r}
 longdata <- rawdata |>
@@ -84,87 +84,113 @@ longdata <- rawdata |>
   filter(!is.na(LocationAbbr)) |>
   mutate(Data_Value = replace_values(Data_Value, from = "*", to = NA)) |>
   arrange(SubTopicId)
-  
-subtopics <- longdata |>
-  distinct(SubTopic, SubTopicId) |>
-  arrange(SubTopicId)
-
-#view subtopics
-subtopics
 ```
 
 Turn the data wide by subtopic.
 
 ```{r}
 longdata |>
-  select(-c("SubTopic")) |>
-  pivot_wider(names_from = SubTopicId, values_from = Data_Value) |>
-  select(starts_with("ST")) #for testing
+  select(-c("SubTopicId")) |>
+  pivot_wider(names_from = SubTopic, values_from = Data_Value)
 ```
-Convert variables `ST01` through `ST05` to numeric and store results.
+
+Convert variables to numeric or factors and store results.
 
 ```{r}
 CDC <- longdata |>
-  select(-c("SubTopic")) |>
-  pivot_wider(names_from = SubTopicId, values_from = Data_Value) |>
-  mutate(across(ST01:ST05, as.numeric))
+  select(-c("SubTopicId")) |>
+  pivot_wider(names_from = SubTopic, values_from = Data_Value) |>
+  mutate(across(`Total cycles`:`Total infants born`, as.numeric)) |>
+  mutate(across(`Donor egg services`:`Verified lab accreditation`, as.factor))
 
 #view results
 CDC
 
 CDC |>
-  select(starts_with("ST")) #for testing
+  select(`Total cycles`:`Total infants born`) #for testing
+
+CDC |>
+  select(`Donor egg services`:`Verified lab accreditation`) #for testing
 ```
 
 ## Data Investigation
 
 ### One-Way Contingency Tables
 
-```{r}
+Use one-way contingency tables to display the number of clinics that fall within particular groups (as of a specific year).
 
+```{r}
+CDC |>
+  filter(Year == 2022) |>
+  group_by(`Donor egg services`) |>
+  summarize(count = n())
+
+CDC |>
+  filter(Year == 2022) |>
+  group_by(`Clinic Status`) |>
+  summarize(count = n())
 ```
 
 ### Two-Way Contingency Tables
 
-```{r}
+Use two-way contingency tables to display the number of clinics that fall within particular groups (as of a specific year).
 
+```{r}
+CDC |>
+  filter(Year == 2022) |>
+  group_by(`Donor egg services`, `Clinic Status`) |>
+  summarize(count = n()) |>
+  pivot_wider(names_from = `Clinic Status`, values_from = count)
 ```
 
 ### Numerical Summaries
 
-Numerical summaries (means, medians, sds, etc.) for quantitative variables at levels of categorical variables.
+Numerical summaries (means, medians, sds, etc.) for quantitative variables at levels of categorical variables (as of a specific year).
 
-### Plot 1
+```{r}
+CDC |>
+  filter(Year == 2022) |>
+  group_by(`Gestational carrier services`) |>
+  summarize(count = n(),
+            across(c(Deliveries, `Total infants born`),
+            list("mean" = ~ mean(.x, na.rm = TRUE),
+                 "median" = ~ median(.x, na.rm = TRUE),
+                 "sd" = ~ sd(.x, na.rm = TRUE),
+                 "IQR" = ~ IQR(.x, na.rm = TRUE)),
+            .names = "{.fn}_{.col}"))
+```
+
+### Plot 1: Stacked Bar Chart
 
 ```{r}
 
 ```
 
-### Plot 2
+### Plot 2: Side-by-Side Bar Chart
 
 ```{r}
 
 ```
 
-### Plot 3
+### Plot 3: Histogram
 
 ```{r}
 
 ```
 
-### Plot 4
+### Plot 4: Box Plot
 
 ```{r}
 
 ```
 
-### Plot 5
+### Plot 5: Scatter Plot
 
 ```{r}
 
 ```
 
-### Plot 6
+### Plot 6: Faceted Scatter Plot
 
 ```{r}
 

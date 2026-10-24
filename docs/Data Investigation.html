@@ -332,7 +332,7 @@ TOP01
 #   Geolocation &lt;chr&gt;</code></pre>
 </div>
 </div>
-<p>Replace * values with <em>NA()</em>.</p>
+<p>Replace * values with <em>NA</em>.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>rawdata <span class="sc">|&gt;</span></span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(<span class="st">"Topic"</span>, <span class="st">"TopicId"</span>)) <span class="sc">|&gt;</span></span>
@@ -357,70 +357,19 @@ TOP01
 # ℹ 248 more rows</code></pre>
 </div>
 </div>
-<p>Save the cleaned data up to this point (still long) and save a list of values for <code>SubTopic</code> and <code>SubTopicId</code>.</p>
+<p>Save the cleaned data up to this point (still long).</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>longdata <span class="ot">&lt;-</span> rawdata <span class="sc">|&gt;</span></span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(<span class="st">"Topic"</span>, <span class="st">"TopicId"</span>)) <span class="sc">|&gt;</span></span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(LocationAbbr)) <span class="sc">|&gt;</span></span>
 <span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Data_Value =</span> <span class="fu">replace_values</span>(Data_Value, <span class="at">from =</span> <span class="st">"*"</span>, <span class="at">to =</span> <span class="cn">NA</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(SubTopicId)</span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>subtopics <span class="ot">&lt;-</span> longdata <span class="sc">|&gt;</span></span>
-<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(SubTopic, SubTopicId) <span class="sc">|&gt;</span></span>
-<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(SubTopicId)</span>
-<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a><span class="co">#view subtopics</span></span>
-<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>subtopics</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 12 × 2
-   SubTopic                         SubTopicId
-   &lt;chr&gt;                            &lt;chr&gt;     
- 1 Total cycles                     ST01      
- 2 Fertility preservation cycles    ST02      
- 3 Pregnancies                      ST03      
- 4 Deliveries                       ST04      
- 5 Total infants born               ST05      
- 6 Donor egg services               ST09      
- 7 Donated embryo services          ST10      
- 8 Embryo cryopreservation services ST11      
- 9 Egg cryopreservation services    ST12      
-10 Gestational carrier services     ST13      
-11 SART member                      ST14      
-12 Verified lab accreditation       ST15      </code></pre>
-</div>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(SubTopicId)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Turn the data wide by subtopic.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>longdata <span class="sc">|&gt;</span></span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(<span class="st">"SubTopic"</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> SubTopicId, <span class="at">values_from =</span> Data_Value) <span class="sc">|&gt;</span></span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">starts_with</span>(<span class="st">"ST"</span>)) <span class="co">#for testing</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 1,413 × 12
-   ST01  ST02  ST03  ST04  ST05  ST09  ST10  ST11  ST12  ST13  ST14  ST15 
-   &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;
- 1 376   11    107   86    94    Yes   No    Yes   Yes   Yes   Yes   Yes  
- 2 420   &lt;NA&gt;  123   97    98    Yes   Yes   Yes   Yes   Yes   No    Yes  
- 3 169   9     33    24    27    Yes   Yes   Yes   Yes   Yes   Yes   Yes  
- 4 740   19    184   159   167   No    No    Yes   Yes   No    Yes   Yes  
- 5 140   &lt;NA&gt;  47    35    38    No    No    Yes   Yes   No    Yes   Yes  
- 6 31    0     &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;  No    No    Yes   Yes   No    Yes   Yes  
- 7 71    0     22    20    22    Yes   Yes   Yes   Yes   Yes   No    No   
- 8 354   13    105   93    94    Yes   No    Yes   Yes   Yes   Yes   Yes  
- 9 2010  148   522   446   453   Yes   No    Yes   Yes   Yes   Yes   Yes  
-10 44    &lt;NA&gt;  24    19    26    Yes   No    Yes   Yes   No    No    Yes  
-# ℹ 1,403 more rows</code></pre>
-</div>
-</div>
-<p>Convert variables <code>ST01</code> through <code>ST05</code> to numeric and store results.</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>CDC <span class="ot">&lt;-</span> longdata <span class="sc">|&gt;</span></span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(<span class="st">"SubTopic"</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> SubTopicId, <span class="at">values_from =</span> Data_Value) <span class="sc">|&gt;</span></span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(ST01<span class="sc">:</span>ST05, as.numeric))</span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="co">#view results</span></span>
-<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>CDC</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>longdata <span class="sc">|&gt;</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(<span class="st">"SubTopicId"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> SubTopic, <span class="at">values_from =</span> Data_Value)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 1,413 × 24
     Year LocationAbbr LocationDesc  FacilityName   MedicalDirector Address City 
@@ -437,27 +386,85 @@ TOP01
 10  2020 WV           West Virginia Cabell Huntin… William N. Bur… 1600 M… Hunt…
 # ℹ 1,403 more rows
 # ℹ 17 more variables: Zipcode &lt;chr&gt;, Phone &lt;chr&gt;, `Clinic Status` &lt;chr&gt;,
-#   ClinicId &lt;dbl&gt;, Geolocation &lt;chr&gt;, ST01 &lt;dbl&gt;, ST02 &lt;dbl&gt;, ST03 &lt;dbl&gt;,
-#   ST04 &lt;dbl&gt;, ST05 &lt;dbl&gt;, ST09 &lt;chr&gt;, ST10 &lt;chr&gt;, ST11 &lt;chr&gt;, ST12 &lt;chr&gt;,
-#   ST13 &lt;chr&gt;, ST14 &lt;chr&gt;, ST15 &lt;chr&gt;</code></pre>
+#   ClinicId &lt;dbl&gt;, Geolocation &lt;chr&gt;, `Total cycles` &lt;chr&gt;,
+#   `Fertility preservation cycles` &lt;chr&gt;, Pregnancies &lt;chr&gt;, Deliveries &lt;chr&gt;,
+#   `Total infants born` &lt;chr&gt;, `Donor egg services` &lt;chr&gt;,
+#   `Donated embryo services` &lt;chr&gt;, `Embryo cryopreservation services` &lt;chr&gt;,
+#   `Egg cryopreservation services` &lt;chr&gt;, …</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>CDC <span class="sc">|&gt;</span></span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">starts_with</span>(<span class="st">"ST"</span>)) <span class="co">#for testing</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Convert variables to numeric or factors and store results.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>CDC <span class="ot">&lt;-</span> longdata <span class="sc">|&gt;</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(<span class="st">"SubTopicId"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> SubTopic, <span class="at">values_from =</span> Data_Value) <span class="sc">|&gt;</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="st">`</span><span class="at">Total cycles</span><span class="st">`</span><span class="sc">:</span><span class="st">`</span><span class="at">Total infants born</span><span class="st">`</span>, as.numeric)) <span class="sc">|&gt;</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="st">`</span><span class="at">Donor egg services</span><span class="st">`</span><span class="sc">:</span><span class="st">`</span><span class="at">Verified lab accreditation</span><span class="st">`</span>, as.factor))</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="co">#view results</span></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>CDC</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 1,413 × 12
-    ST01  ST02  ST03  ST04  ST05 ST09  ST10  ST11  ST12  ST13  ST14  ST15 
-   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;
- 1   376    11   107    86    94 Yes   No    Yes   Yes   Yes   Yes   Yes  
- 2   420    NA   123    97    98 Yes   Yes   Yes   Yes   Yes   No    Yes  
- 3   169     9    33    24    27 Yes   Yes   Yes   Yes   Yes   Yes   Yes  
- 4   740    19   184   159   167 No    No    Yes   Yes   No    Yes   Yes  
- 5   140    NA    47    35    38 No    No    Yes   Yes   No    Yes   Yes  
- 6    31     0    NA    NA    NA No    No    Yes   Yes   No    Yes   Yes  
- 7    71     0    22    20    22 Yes   Yes   Yes   Yes   Yes   No    No   
- 8   354    13   105    93    94 Yes   No    Yes   Yes   Yes   Yes   Yes  
- 9  2010   148   522   446   453 Yes   No    Yes   Yes   Yes   Yes   Yes  
-10    44    NA    24    19    26 Yes   No    Yes   Yes   No    No    Yes  
-# ℹ 1,403 more rows</code></pre>
+<pre><code># A tibble: 1,413 × 24
+    Year LocationAbbr LocationDesc  FacilityName   MedicalDirector Address City 
+   &lt;dbl&gt; &lt;chr&gt;        &lt;chr&gt;         &lt;chr&gt;          &lt;chr&gt;           &lt;chr&gt;   &lt;chr&gt;
+ 1  2020 FL           Florida       Florida Ferti… Mark D. Sanche… 2454 N… Clea…
+ 2  2020 WA           Washington    Overlake Repr… Kevin M. Johns… 11232 … Bell…
+ 3  2020 CO           Colorado      Colorado Repr… Susan  Trout, … 4600 E… Denv…
+ 4  2020 NY           New York      Boston IVF, T… Sonia  Elguero… 399 Al… Loud…
+ 5  2020 TX           Texas         Brooke Army M… Belinda J. Yau… Depart… Fort…
+ 6  2020 IL           Illinois      Carle Foundat… Nancy  Fay, MD  1818 E… Urba…
+ 7  2020 CA           California    The Fertility… Edward J. Rami… 9833 B… Mont…
+ 8  2020 TX           Texas         Austin Fertil… Kenneth K. Mog… 2200 P… Aust…
+ 9  2020 NJ           New Jersey    Institute for… Margaret G. Ga… 94 Old… Livi…
+10  2020 WV           West Virginia Cabell Huntin… William N. Bur… 1600 M… Hunt…
+# ℹ 1,403 more rows
+# ℹ 17 more variables: Zipcode &lt;chr&gt;, Phone &lt;chr&gt;, `Clinic Status` &lt;chr&gt;,
+#   ClinicId &lt;dbl&gt;, Geolocation &lt;chr&gt;, `Total cycles` &lt;dbl&gt;,
+#   `Fertility preservation cycles` &lt;dbl&gt;, Pregnancies &lt;dbl&gt;, Deliveries &lt;dbl&gt;,
+#   `Total infants born` &lt;dbl&gt;, `Donor egg services` &lt;fct&gt;,
+#   `Donated embryo services` &lt;fct&gt;, `Embryo cryopreservation services` &lt;fct&gt;,
+#   `Egg cryopreservation services` &lt;fct&gt;, …</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>CDC <span class="sc">|&gt;</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="st">`</span><span class="at">Total cycles</span><span class="st">`</span><span class="sc">:</span><span class="st">`</span><span class="at">Total infants born</span><span class="st">`</span>) <span class="co">#for testing</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1,413 × 5
+   `Total cycles` `Fertility preservation cycles` Pregnancies Deliveries
+            &lt;dbl&gt;                           &lt;dbl&gt;       &lt;dbl&gt;      &lt;dbl&gt;
+ 1            376                              11         107         86
+ 2            420                              NA         123         97
+ 3            169                               9          33         24
+ 4            740                              19         184        159
+ 5            140                              NA          47         35
+ 6             31                               0          NA         NA
+ 7             71                               0          22         20
+ 8            354                              13         105         93
+ 9           2010                             148         522        446
+10             44                              NA          24         19
+# ℹ 1,403 more rows
+# ℹ 1 more variable: `Total infants born` &lt;dbl&gt;</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>CDC <span class="sc">|&gt;</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="st">`</span><span class="at">Donor egg services</span><span class="st">`</span><span class="sc">:</span><span class="st">`</span><span class="at">Verified lab accreditation</span><span class="st">`</span>) <span class="co">#for testing</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1,413 × 7
+   `Donor egg services` `Donated embryo services` Embryo cryopreservation serv…¹
+   &lt;fct&gt;                &lt;fct&gt;                     &lt;fct&gt;                         
+ 1 Yes                  No                        Yes                           
+ 2 Yes                  Yes                       Yes                           
+ 3 Yes                  Yes                       Yes                           
+ 4 No                   No                        Yes                           
+ 5 No                   No                        Yes                           
+ 6 No                   No                        Yes                           
+ 7 Yes                  Yes                       Yes                           
+ 8 Yes                  No                        Yes                           
+ 9 Yes                  No                        Yes                           
+10 Yes                  No                        Yes                           
+# ℹ 1,403 more rows
+# ℹ abbreviated name: ¹​`Embryo cryopreservation services`
+# ℹ 4 more variables: `Egg cryopreservation services` &lt;fct&gt;,
+#   `Gestational carrier services` &lt;fct&gt;, `SART member` &lt;fct&gt;,
+#   `Verified lab accreditation` &lt;fct&gt;</code></pre>
 </div>
 </div>
 </section>
@@ -466,31 +473,108 @@ TOP01
 <h2 class="anchored" data-anchor-id="data-investigation">Data Investigation</h2>
 <section id="one-way-contingency-tables" class="level3">
 <h3 class="anchored" data-anchor-id="one-way-contingency-tables">One-Way Contingency Tables</h3>
+<p>Use one-way contingency tables to display the number of clinics that fall within particular groups (as of a specific year).</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>CDC <span class="sc">|&gt;</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Year <span class="sc">==</span> <span class="dv">2022</span>) <span class="sc">|&gt;</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(<span class="st">`</span><span class="at">Donor egg services</span><span class="st">`</span>) <span class="sc">|&gt;</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">count =</span> <span class="fu">n</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 2
+  `Donor egg services` count
+  &lt;fct&gt;                &lt;int&gt;
+1 No                      53
+2 Yes                    404
+3 &lt;NA&gt;                    54</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>CDC <span class="sc">|&gt;</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Year <span class="sc">==</span> <span class="dv">2022</span>) <span class="sc">|&gt;</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(<span class="st">`</span><span class="at">Clinic Status</span><span class="st">`</span>) <span class="sc">|&gt;</span></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">count =</span> <span class="fu">n</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 2
+  `Clinic Status` count
+  &lt;chr&gt;           &lt;int&gt;
+1 Closed              5
+2 Non-reporter       54
+3 Open              422
+4 Reorganized        30</code></pre>
+</div>
+</div>
 </section>
 <section id="two-way-contingency-tables" class="level3">
 <h3 class="anchored" data-anchor-id="two-way-contingency-tables">Two-Way Contingency Tables</h3>
+<p>Use two-way contingency tables to display the number of clinics that fall within particular groups (as of a specific year).</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>CDC <span class="sc">|&gt;</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Year <span class="sc">==</span> <span class="dv">2022</span>) <span class="sc">|&gt;</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(<span class="st">`</span><span class="at">Donor egg services</span><span class="st">`</span>, <span class="st">`</span><span class="at">Clinic Status</span><span class="st">`</span>) <span class="sc">|&gt;</span></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">count =</span> <span class="fu">n</span>()) <span class="sc">|&gt;</span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> <span class="st">`</span><span class="at">Clinic Status</span><span class="st">`</span>, <span class="at">values_from =</span> count)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`summarise()` has regrouped the output.
+ℹ Summaries were computed grouped by Donor egg services and Clinic Status.
+ℹ Output is grouped by Donor egg services.
+ℹ Use `summarise(.groups = "drop_last")` to silence this message.
+ℹ Use `summarise(.by = c(Donor egg services, Clinic Status))` for per-operation
+  grouping (`?dplyr::dplyr_by`) instead.</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 5
+# Groups:   Donor egg services [3]
+  `Donor egg services` Closed  Open Reorganized `Non-reporter`
+  &lt;fct&gt;                 &lt;int&gt; &lt;int&gt;       &lt;int&gt;          &lt;int&gt;
+1 No                        2    48           3             NA
+2 Yes                       3   374          27             NA
+3 &lt;NA&gt;                     NA    NA          NA             54</code></pre>
+</div>
+</div>
 </section>
 <section id="numerical-summaries" class="level3">
 <h3 class="anchored" data-anchor-id="numerical-summaries">Numerical Summaries</h3>
-<p>Numerical summaries (means, medians, sds, etc.) for quantitative variables at levels of categorical variables.</p>
+<p>Numerical summaries (means, medians, sds, etc.) for quantitative variables at levels of categorical variables (as of a specific year).</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>CDC <span class="sc">|&gt;</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Year <span class="sc">==</span> <span class="dv">2022</span>) <span class="sc">|&gt;</span></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(<span class="st">`</span><span class="at">Gestational carrier services</span><span class="st">`</span>) <span class="sc">|&gt;</span></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">count =</span> <span class="fu">n</span>(),</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>            <span class="fu">across</span>(<span class="fu">c</span>(Deliveries, <span class="st">`</span><span class="at">Total infants born</span><span class="st">`</span>),</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>            <span class="fu">list</span>(<span class="st">"mean"</span> <span class="ot">=</span> <span class="er">~</span> <span class="fu">mean</span>(.x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>                 <span class="st">"median"</span> <span class="ot">=</span> <span class="er">~</span> <span class="fu">median</span>(.x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>                 <span class="st">"sd"</span> <span class="ot">=</span> <span class="er">~</span> <span class="fu">sd</span>(.x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a>                 <span class="st">"IQR"</span> <span class="ot">=</span> <span class="er">~</span> <span class="fu">IQR</span>(.x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)),</span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a>            <span class="at">.names =</span> <span class="st">"{.fn}_{.col}"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 10
+  Gestational carrier se…¹ count mean_Deliveries median_Deliveries sd_Deliveries
+  &lt;fct&gt;                    &lt;int&gt;           &lt;dbl&gt;             &lt;dbl&gt;         &lt;dbl&gt;
+1 No                          44            57.5               40           49.3
+2 Yes                        413           225.               126.         326. 
+3 &lt;NA&gt;                        54           NaN                 NA           NA  
+# ℹ abbreviated name: ¹​`Gestational carrier services`
+# ℹ 5 more variables: IQR_Deliveries &lt;dbl&gt;, `mean_Total infants born` &lt;dbl&gt;,
+#   `median_Total infants born` &lt;dbl&gt;, `sd_Total infants born` &lt;dbl&gt;,
+#   `IQR_Total infants born` &lt;dbl&gt;</code></pre>
+</div>
+</div>
 </section>
-<section id="plot-1" class="level3">
-<h3 class="anchored" data-anchor-id="plot-1">Plot 1</h3>
+<section id="plot-1-stacked-bar-chart" class="level3">
+<h3 class="anchored" data-anchor-id="plot-1-stacked-bar-chart">Plot 1: Stacked Bar Chart</h3>
 </section>
-<section id="plot-2" class="level3">
-<h3 class="anchored" data-anchor-id="plot-2">Plot 2</h3>
+<section id="plot-2-side-by-side-bar-chart" class="level3">
+<h3 class="anchored" data-anchor-id="plot-2-side-by-side-bar-chart">Plot 2: Side-by-Side Bar Chart</h3>
 </section>
-<section id="plot-3" class="level3">
-<h3 class="anchored" data-anchor-id="plot-3">Plot 3</h3>
+<section id="plot-3-histogram" class="level3">
+<h3 class="anchored" data-anchor-id="plot-3-histogram">Plot 3: Histogram</h3>
 </section>
-<section id="plot-4" class="level3">
-<h3 class="anchored" data-anchor-id="plot-4">Plot 4</h3>
+<section id="plot-4-box-plot" class="level3">
+<h3 class="anchored" data-anchor-id="plot-4-box-plot">Plot 4: Box Plot</h3>
 </section>
-<section id="plot-5" class="level3">
-<h3 class="anchored" data-anchor-id="plot-5">Plot 5</h3>
+<section id="plot-5-scatter-plot" class="level3">
+<h3 class="anchored" data-anchor-id="plot-5-scatter-plot">Plot 5: Scatter Plot</h3>
 </section>
-<section id="plot-6" class="level3">
-<h3 class="anchored" data-anchor-id="plot-6">Plot 6</h3>
+<section id="plot-6-faceted-scatter-plot" class="level3">
+<h3 class="anchored" data-anchor-id="plot-6-faceted-scatter-plot">Plot 6: Faceted Scatter Plot</h3>
 
 
 </section>
