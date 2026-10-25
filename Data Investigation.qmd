@@ -20,6 +20,8 @@ First, load in all libraries that are needed for this data investigation.
 ```{r}
 library(tidyverse)
 library(dplyr)
+library(ggplot2)
+library(usmap)
 ```
 
 ### Read in Data
@@ -111,6 +113,9 @@ CDC |>
 
 CDC |>
   select(`Donor egg services`:`Verified lab accreditation`) #for testing
+
+#Save to rds file
+write_rds(CDC, "data/Cleaned CDC data.rds")
 ```
 
 ## Data Investigation
@@ -160,38 +165,82 @@ CDC |>
             .names = "{.fn}_{.col}"))
 ```
 
-### Plot 1: Stacked Bar Chart
+### Plot 1: Bar Chart
 
 ```{r}
+
+ggplot(data = CDC,
+       aes(x = Year, fill = `Gestational carrier services`)) +
+  geom_bar() +
+  labs(y = "Number of Clinics") +
+  theme_light()
 
 ```
 
-### Plot 2: Side-by-Side Bar Chart
+### Plot 2: Smoothed Histogram
 
 ```{r}
+ggplot(data = CDC |>
+         filter(Year == 2022, Pregnancies < 1500) |>
+         drop_na(Pregnancies)) +
+  geom_density(aes(alpha = 0.5, x = Pregnancies,
+                   fill = `Gestational carrier services`)) +
+  theme_light()
+```
+
+### Plot 3: Box Plot
+
+```{r}
+
+ggplot(data = CDC |>
+         filter(Year == 2022,
+                LocationDesc %in% c("New York",
+                                    "California",
+                                    "North Carolina")),
+       aes(x = LocationDesc, y = Pregnancies, fill = LocationDesc)) +
+  geom_boxplot() +
+  theme_light()
 
 ```
 
-### Plot 3: Histogram
+### Plot 4: Scatter Plot
 
 ```{r}
-
+ggplot(data = CDC |>
+         filter(Year == 2022,
+                LocationDesc %in% c("New York",
+                                    "California",
+                                    "North Carolina"),
+                `Total cycles` < 10000) |>
+         drop_na(`Total cycles`, Pregnancies),
+       aes(x = `Total cycles`, y = Pregnancies, color = LocationDesc)) +
+  geom_point() +
+  geom_smooth(method = lm) + 
+  theme_light()
 ```
 
-### Plot 4: Box Plot
+### Plot 5: Faceted Smooth Histogram
 
 ```{r}
-
+ggplot(data = CDC |>
+         filter(Pregnancies < 1500) |>
+         drop_na(Pregnancies)) +
+  geom_density(aes(alpha = 0.5, x = Pregnancies,
+                   fill = `Gestational carrier services`)) +
+  facet_wrap(~ Year) +
+  theme_light()
 ```
 
-### Plot 5: Scatter Plot
+### Plot 6: Map
 
 ```{r}
-
-```
-
-### Plot 6: Faceted Scatter Plot
-
-```{r}
-
+plot_usmap(data = CDC |>
+             filter(Year == 2022) |>
+             drop_na(Pregnancies) |>
+             rename(state = LocationAbbr) |>
+             group_by(state) |>
+             summarize(Pregnancies = sum(Pregnancies)),
+           values = "Pregnancies",
+           regions = "states") +
+  scale_fill_continuous(low = "white", high = "red", name = "Pregnancies")
 ```
