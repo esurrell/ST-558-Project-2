@@ -6,17 +6,32 @@ library(dplyr)
 # Bring in data needed for this app
 CDC <- readRDS("data/Cleaned CDC data.rds")
 
-# Create list for state options
+# State options
 states <- CDC |>
   distinct(LocationDesc) |>
   arrange(LocationDesc)
 
 states <- c("All States", states$LocationDesc)
 
-# Create list for city options
+# City options
 cities <- CDC |>
   distinct(LocationDesc, City) |>
   arrange(LocationDesc, City)
+
+# Numeric variable options
+numvar_options <- c('Total cycles',
+                    'Fertility preservation cycles',
+                    'Pregnancies',
+                    'Deliveries',
+                    'Total infants born')
+
+numvar_range = list()
+for (i in 1:5){
+  numvar_range[[i]] <- quantile(CDC[numvar_options[i]],
+                              probs = c(0, 0.1, 0.9, 1),
+                              na.rm = TRUE)
+  
+}
 
 # Define UI
 ui <- fluidPage(
@@ -26,7 +41,12 @@ ui <- fluidPage(
   
   sidebarLayout(
     sidebarPanel(
-      h3("Filter Criteria:"),
+      
+      fluidRow(
+        column(6, h4("Filter Criteria:")),
+        column(6, align = "right", actionButton(inputId = "refresh_data",
+                                                label = "Apply Filters"))
+        ),
       
       selectizeInput(inputId = "state",
                      label = "State",
@@ -36,10 +56,27 @@ ui <- fluidPage(
       selectizeInput(inputId = "city",
                      label = "City",
                      choices = "All Cities",
-                     selected = "All Cities")
+                     selected = "All Cities"),
       
-      #Annual Cycles
-      #Annual Deliveries
+      checkboxGroupInput(inputId = "numeric_vars",
+                         label = "Select Numeric Variables to Filter By:",
+                         choices = numvar_options,
+                         selected = NULL),
+      
+      # Sliders that conditionally appear based on checkboxes
+      lapply(1:5, function(i){
+        conditionalPanel(
+          condition = paste0("input.numeric_vars.includes('", numvar_options[i], "')"),
+          sliderInput(inputId = numvar_options[i],
+                        label = numvar_options[i],
+                        min = numvar_range[[i]][[1]], #defaults to min of unfiltered data
+                        max = numvar_range[[i]][[4]], #defaults to max of unfiltered data
+                        value = c(numvar_range[[i]][[2]],
+                                  numvar_range[[i]][[3]]) #defaults to 10-90th percentiles of unfiltered data
+          )
+        )
+      })
+      
     ),
     
     mainPanel()
@@ -68,6 +105,7 @@ server <- function(input, output, session) {
                            selected = "All Cities")
     }
   })
+  
 }
 
 # Run the application 
