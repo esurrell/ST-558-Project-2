@@ -44,7 +44,7 @@ ui <- fluidPage(
       
       fluidRow(
         column(6, h4("Filter Criteria:")),
-        column(6, align = "right", actionButton(inputId = "refresh_data",
+        column(6, align = "right", actionButton(inputId = "apply_filters",
                                                 label = "Apply Filters"))
         ),
       
@@ -78,7 +78,9 @@ ui <- fluidPage(
       
     ),
     
-    mainPanel()
+    mainPanel(
+      tableOutput("test")
+    )
   )
 )
 
@@ -103,6 +105,27 @@ server <- function(input, output, session) {
                            choices = city_choices,
                            selected = "All Cities")
     }
+  })
+  
+  # If the user presses the action button, filter the data
+  filterdata <- eventReactive(input$apply_filters, {
+    df <- CDC |>
+      filter(LocationDesc == input$state | input$state == "All States") |>
+      filter(City == input$city | input$city == "All Cities")
+    
+    for (i in 1:5){
+      df <- df |>
+        filter((get(numvar_options[i]) >= input[[numvar_options[i]]][1] &
+                  get(numvar_options[i]) <= input[[numvar_options[i]]][2])|
+                 !(numvar_options[i] %in% input$numeric_vars))
+    }
+    
+    return(df)
+      
+  }, ignoreNULL = FALSE)
+  
+  output$test <- renderTable({
+    table(filterdata()$City)
   })
   
 }
