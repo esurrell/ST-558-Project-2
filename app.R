@@ -28,7 +28,7 @@ numvar_options <- c('Total cycles',
 numvar_range = list()
 for (i in 1:5){
   numvar_range[[i]] <- quantile(CDC[numvar_options[i]],
-                              probs = c(0, 0.1, 0.9, 1),
+                              probs = c(0, 1),
                               na.rm = TRUE)
   
 }
@@ -70,10 +70,9 @@ ui <- fluidPage(
           sliderInput(inputId = numvar_options[i],
                         label = numvar_options[i],
                         min = numvar_range[[i]][[1]], #defaults to min of unfiltered data
-                        max = numvar_range[[i]][[4]], #defaults to max of unfiltered data
-                        value = c(numvar_range[[i]][[2]],
-                                  numvar_range[[i]][[3]]) #defaults to 10-90th percentiles of unfiltered data
-          )
+                        max = numvar_range[[i]][[2]], #defaults to max of unfiltered data
+                        value = c(numvar_range[[i]][[1]],
+                                  numvar_range[[i]][[2]]))
         )
       })
       
