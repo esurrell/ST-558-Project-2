@@ -95,7 +95,7 @@ ui <- fluidPage(
                          choices = slider_options,
                          selected = NULL),
       
-      # Sliders that conditionally appear based on checkboxes
+      # Sliders that conditionally appear based on check boxes
       lapply(1:5, function(i){
         conditionalPanel(
           condition = paste0("input.slider_vars.includes('", slider_options[i], "')"),
@@ -126,21 +126,26 @@ ui <- fluidPage(
                    tabPanel("One and Two-Way Contingency Tables",
                             br(),
                             fluidRow(
-                            column(6, selectizeInput(inputId = "contingency1",
+                            column(4, radioButtons(
+                                inputId = "contingency_display", 
+                                label = "Display counts of:", 
+                                choices = c("Unique Clinics","Total Records (One Record Per Clinic Per Year)"),
+                                selected = "Unique Clinics")),
+                            column(4, selectizeInput(inputId = "contingency1",
                                   label = "Select First Categorical Variable:",
                                   choices = charvar_options,
                                   selected = charvar_options[1])),
-                            column(6, selectizeInput(inputId = "contingency2",
+                            column(4, selectizeInput(inputId = "contingency2",
                                   label = "Select Second Categorical Variable:",
                                   choices = charvar_options,
-                                  selected = charvar_options[2])),
+                                  selected = charvar_options[2]))
                             ),
-                            h4("One-Way Contingency Tables:"),
+                            h4("One-Way Contingency Tables"),
                             fluidRow(
                             column(6, tableOutput("contingencytable1")),
                             column(6, tableOutput("contingencytable2"))
                             ),
-                            h4("Two-Way Contingency Table:"),
+                            h4("Two-Way Contingency Table"),
                             tableOutput("contingencytable1and2")
                             ),
                    
@@ -226,10 +231,18 @@ server <- function(input, output, session) {
   
   # First one-way contingency table
   output$contingencytable1 <- renderTable({
-    df <- filterdata() |>
-      distinct(get(input$contingency1), ClinicId) |>
-      group_by(`get(input$contingency1)`) |>
-      summarize(`Number of Unique Clinics` = n())
+    
+    if (input$contingency_display == "Unique Clinics"){
+      df <- filterdata() |>
+        distinct(get(input$contingency1), ClinicId) |>
+        group_by(`get(input$contingency1)`) |>
+        summarize(`Number of Unique Clinics` = n())
+    } else {
+      df <- filterdata() |>
+        distinct(get(input$contingency1), ClinicId, Year) |>
+        group_by(`get(input$contingency1)`) |>
+        summarize(`Number of Records (One Record Per Clinic Per Year)` = n())
+    }
     
     colnames(df)[1] <- input$contingency1
     
@@ -238,10 +251,18 @@ server <- function(input, output, session) {
   
   # Second one-way contingency table
   output$contingencytable2 <- renderTable({
-    df <- filterdata() |>
-      distinct(get(input$contingency2), ClinicId) |>
-      group_by(`get(input$contingency2)`) |>
-      summarize(`Number of Unique Clinics` = n())
+    
+    if (input$contingency_display == "Unique Clinics"){
+      df <- filterdata() |>
+        distinct(get(input$contingency2), ClinicId) |>
+        group_by(`get(input$contingency2)`) |>
+        summarize(`Number of Unique Clinics` = n())
+    } else {
+      df <- filterdata() |>
+        distinct(get(input$contingency2), ClinicId, Year) |>
+        group_by(`get(input$contingency2)`) |>
+        summarize(`Number of Records (One Record Per Clinic Per Year)` = n())
+    }
     
     colnames(df)[1] <- input$contingency2
     
@@ -250,11 +271,20 @@ server <- function(input, output, session) {
   
   # Two-way contingency table
   output$contingencytable1and2 <- renderTable({
-    df <- filterdata() |>
-      distinct(get(input$contingency1), get(input$contingency2), ClinicId) |>
-      group_by(`get(input$contingency1)`, `get(input$contingency2)`) |>
-      summarize(count = n()) |>
-      pivot_wider(names_from = `get(input$contingency2)`, values_from = count)
+    
+    if (input$contingency_display == "Unique Clinics"){
+      df <- filterdata() |>
+        distinct(get(input$contingency1), get(input$contingency2), ClinicId) |>
+        group_by(`get(input$contingency1)`, `get(input$contingency2)`) |>
+        summarize(count = n()) |>
+        pivot_wider(names_from = `get(input$contingency2)`, values_from = count)
+    } else {
+      df <- filterdata() |>
+        distinct(get(input$contingency1), get(input$contingency2), ClinicId, Year) |>
+        group_by(`get(input$contingency1)`, `get(input$contingency2)`) |>
+        summarize(count = n()) |>
+        pivot_wider(names_from = `get(input$contingency2)`, values_from = count)
+    }
     
     colnames(df)[1] <- input$contingency1
     
