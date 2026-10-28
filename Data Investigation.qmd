@@ -184,10 +184,9 @@ update_theme(plot.title = element_text(hjust = 0.5))
 ```{r}
 
 ggplot(data = CDC,
-       aes(x = Year, fill = `Gestational carrier services`)) +
-  geom_bar() +
-  labs(y = "Number of Clinics") +
-  labs(title = str_wrap("Number of Clinics by Year and Gestational carrier services", width = 50))
+       aes(x = Year, y = Deliveries, fill = `Gestational carrier services`)) +
+  geom_col() +
+  labs(title = str_wrap("Deliveries by Year and Gestational carrier services", width = 50))
 
 ```
 
@@ -233,11 +232,10 @@ ggplot(data = CDC |>
 
 ```{r}
 ggplot(data = CDC,
-       aes(x = Year, fill = `Gestational carrier services`)) +
-  geom_bar() +
+       aes(x = Year, y = Deliveries, fill = `Gestational carrier services`)) +
+  geom_col() +
   facet_wrap(~ `Verified lab accreditation`) +
-  labs(y = "Number of Clinics") +
-  labs(title = str_wrap("Number of Clinics by Year, Gestational carrier services, and Verified lab accreditation", width = 50))
+  labs(title = str_wrap("Deliveries by Year, Gestational carrier services, and Verified lab accreditation", width = 50))
   
 ```
 

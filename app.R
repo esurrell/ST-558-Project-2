@@ -3,6 +3,7 @@ library(shiny)
 library(DT)
 library(tidyverse)
 library(dplyr)
+library(bslib)
 
 # Bring in data needed for this app
 CDC <- readRDS("data/Cleaned CDC data.rds")
@@ -69,6 +70,8 @@ ui <- fluidPage(
   sidebarLayout(
     sidebarPanel(
       
+      width = 2,
+      
       fluidRow(
         column(6, h4("Filter Criteria:")),
         column(6, align = "right", actionButton(inputId = "apply_filters",
@@ -111,6 +114,9 @@ ui <- fluidPage(
     ),
     
     mainPanel(
+      
+      width = 10,
+      
       tabsetPanel(
         tabPanel("About"),
         tabPanel("Data Download",
@@ -126,16 +132,16 @@ ui <- fluidPage(
                    tabPanel("One and Two-Way Contingency Tables",
                             br(),
                             fluidRow(
-                            column(4, radioButtons(
+                            column(3, radioButtons(
                                 inputId = "contingency_display", 
                                 label = "Display counts of:", 
                                 choices = c("Unique Clinics","Total Records (One Record Per Clinic Per Year)"),
                                 selected = "Unique Clinics")),
-                            column(4, selectizeInput(inputId = "contingency1",
+                            column(3, selectizeInput(inputId = "contingency1",
                                   label = "Select First Categorical Variable:",
                                   choices = charvar_options,
                                   selected = charvar_options[1])),
-                            column(4, selectizeInput(inputId = "contingency2",
+                            column(3, selectizeInput(inputId = "contingency2",
                                   label = "Select Second Categorical Variable:",
                                   choices = charvar_options,
                                   selected = charvar_options[2]))
@@ -152,11 +158,11 @@ ui <- fluidPage(
                    tabPanel("Numeric Data Summaries",
                             br(),
                             fluidRow(
-                              column(6, selectizeInput(inputId = "numericsummary1",
+                              column(3, selectizeInput(inputId = "numericsummary1",
                                     label = "Select Categorical Variable:",
                                     choices = charvar_options,
                                     selected = charvar_options[1])),
-                              column(6, selectizeInput(inputId = "numericsummary2",
+                              column(3, selectizeInput(inputId = "numericsummary2",
                                     label = "Select Numeric Variable:",
                                     choices = numvar_options,
                                     selected = numvar_options[1])),
@@ -165,13 +171,51 @@ ui <- fluidPage(
                             tableOutput("numeric_summary")
                             ),
                    
-                   tabPanel("Plots")
+                   tabPanel("Plots",
+                            br(),
+                            navset_pill_list(
+                              widths = c(2,10),
+                              nav_panel("Bar Chart",
+                                               fluidRow(
+                                                 column(3, 
+                                                        selectizeInput(inputId = "plot1_x",
+                                                                       label = "X Axis",
+                                                                       choices = charvar_options,
+                                                                       selected = charvar_options[1]),
+                                                        selectizeInput(inputId = "plot1_y",
+                                                                       label = "Y Axis",
+                                                                       choices = numvar_options,
+                                                                       selected = numvar_options[1]),
+                                                        selectizeInput(inputId = "plot1_fill",
+                                                                       label = "Color By",
+                                                                       choices = charvar_options,
+                                                                       selected = charvar_options[2])
+                                                 ),
+                                                 conditionalPanel(
+                                                   condition = paste0("input.plot1_x == input.plot1_fill"),
+                                                   column(9, "Please select two different variables for the X Axis and Color By options.")
+                                                 ),
+                                                 conditionalPanel(
+                                                   condition = paste0("input.plot1_x != input.plot1_fill"),
+                                                   column(9, plotOutput("plot1"))
+                                                 )
+                                               )
+                              ),
+                              nav_panel("Smoothed Histogram"),
+                              nav_panel("Box Plot"),
+                              nav_panel("Scatter Plot"),
+                              nav_panel("Faceted Bar Chart"),
+                              nav_panel("Map")
+                            )
+                            
+                             
+                           ))
                  ))
-      )
-      
     )
+      
   )
 )
+
 
 # Define Server
 server <- function(input, output, session) {
@@ -315,6 +359,56 @@ server <- function(input, output, session) {
     colnames(df)[1] <- input$numericsummary1
     
     return(df)
+  })
+  
+  #Plot 1
+  output$plot1 <- renderPlot({
+    
+    if(input$plot1_y == "Number of Records (One Record Per Clinic Per Year)"){
+      df <- filterdata() |>
+        group_by(get(input$plot1_x), get(input$plot1_fill)) |>
+        summarize(`Number of Records (One Record Per Clinic Per Year)` = n())
+    } 
+    
+    else if (input$plot1_y == "Ratio of Pregnancies to Total cycles"){
+      df <- filterdata() |>
+        group_by(get(input$plot1_x), get(input$plot1_fill)) |>
+        summarize(numerator = sum(Pregnancies, na.rm = TRUE), denominator = sum(`Total cycles`, na.rm = TRUE)) |>
+        mutate(ratio = if_else((denominator > 0), numerator / denominator, NA)) |>
+        select(-c(numerator, denominator))
+    } 
+    
+    else if (input$plot1_y == "Ratio of Deliveries to Pregnancies"){
+      df <- filterdata() |>
+        group_by(get(input$plot1_x), get(input$plot1_fill)) |>
+        summarize(numerator = sum(Deliveries, na.rm = TRUE), denominator = sum(Pregnancies, na.rm = TRUE)) |>
+        mutate(ratio = if_else((denominator > 0), numerator / denominator, NA)) |>
+        select(-c(numerator, denominator))
+    } 
+    
+    else if (input$plot1_y == "Ratio of Total infants born to Deliveries"){
+      df <- filterdata() |>
+        group_by(get(input$plot1_x), get(input$plot1_fill)) |>
+        summarize(numerator = sum(`Total infants born`, na.rm = TRUE), denominator = sum(Deliveries, na.rm = TRUE)) |>
+        mutate(ratio = if_else((denominator > 0), numerator / denominator, NA)) |>
+        select(-c(numerator, denominator))
+    }
+    
+    else {
+      df <- filterdata() |>
+        group_by(get(input$plot1_x), get(input$plot1_fill)) |>
+        summarize(sum = sum(get(input$plot1_y), na.rm = TRUE))
+    }
+    
+    colnames(df) <- c(input$plot1_x, input$plot1_fill, input$plot1_y)
+    
+    g <- ggplot(data = df,
+           aes(x = get(input$plot1_x), y = get(input$plot1_y), fill = get(input$plot1_fill))) +
+      geom_col() +
+      labs(x = input$plot1_x, y = input$plot1_y, fill = input$plot1_fill) +
+      labs(title = str_wrap(paste0(input$plot1_y," by ",input$plot1_x," and ",input$plot1_fill), width = 50))
+    
+    return(g)
   })
   
 }
