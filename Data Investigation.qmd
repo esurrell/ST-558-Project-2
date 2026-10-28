@@ -172,6 +172,12 @@ CDC |>
             `Inter-Quartile Range (Per Clinic Per Year)` = IQR(`Total infants born`, na.rm = TRUE))
 
 ```
+For the following plots, center all titles and use `theme_light()`:
+
+```{r}
+set_theme(theme_light())
+update_theme(plot.title = element_text(hjust = 0.5))
+```
 
 ### Plot 1: Bar Chart
 
@@ -181,7 +187,7 @@ ggplot(data = CDC,
        aes(x = Year, fill = `Gestational carrier services`)) +
   geom_bar() +
   labs(y = "Number of Clinics") +
-  theme_light()
+  labs(title = str_wrap("Number of Clinics by Year and Gestational carrier services", width = 50))
 
 ```
 
@@ -193,7 +199,7 @@ ggplot(data = CDC |>
          drop_na(Pregnancies)) +
   geom_density(aes(alpha = 0.5, x = Pregnancies,
                    fill = `Gestational carrier services`)) +
-  theme_light()
+  labs(title = str_wrap("Density of Pregnancies by Gestational carrier services", width = 50))
 ```
 
 ### Plot 3: Box Plot
@@ -202,12 +208,10 @@ ggplot(data = CDC |>
 
 ggplot(data = CDC |>
          filter(Year == 2022,
-                State %in% c("New York",
-                                    "California",
-                                    "North Carolina")),
-       aes(x = State, y = Pregnancies, fill = State)) +
+                State == "North Carolina"),
+       aes(x = City, y = Pregnancies, fill = City)) +
   geom_boxplot() +
-  theme_light()
+  labs(title = str_wrap("Pregnancies by City", width = 50))
 
 ```
 
@@ -216,27 +220,25 @@ ggplot(data = CDC |>
 ```{r}
 ggplot(data = CDC |>
          filter(Year == 2022,
-                State %in% c("New York",
-                                    "California",
-                                    "North Carolina"),
+                State == "North Carolina",
                 `Total cycles` < 10000) |>
          drop_na(`Total cycles`, Pregnancies),
-       aes(x = `Total cycles`, y = Pregnancies, color = State)) +
+       aes(x = `Total cycles`, y = Pregnancies, color = City)) +
   geom_point() +
   geom_smooth(method = lm) + 
-  theme_light()
+  labs(title = str_wrap("Pregnancies and Total cycles by City", width = 50))
 ```
 
-### Plot 5: Faceted Smooth Histogram
+### Plot 5: Faceted Bar Chart
 
 ```{r}
-ggplot(data = CDC |>
-         filter(Pregnancies < 1500) |>
-         drop_na(Pregnancies)) +
-  geom_density(aes(alpha = 0.5, x = Pregnancies,
-                   fill = `Gestational carrier services`)) +
-  facet_wrap(~ Year) +
-  theme_light()
+ggplot(data = CDC,
+       aes(x = Year, fill = `Gestational carrier services`)) +
+  geom_bar() +
+  facet_wrap(~ `Verified lab accreditation`) +
+  labs(y = "Number of Clinics") +
+  labs(title = str_wrap("Number of Clinics by Year, Gestational carrier services, and Verified lab accreditation", width = 50))
+  
 ```
 
 ### Plot 6: Map
@@ -250,5 +252,6 @@ plot_usmap(data = CDC |>
              summarize(Pregnancies = sum(Pregnancies)),
            values = "Pregnancies",
            regions = "states") +
-  scale_fill_continuous(low = "white", high = "red", name = "Pregnancies")
+  scale_fill_continuous(low = "white", high = "red", name = "Pregnancies") +
+  labs(title = str_wrap("Pregnancies by State", width = 50))
 ```
