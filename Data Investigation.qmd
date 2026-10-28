@@ -96,14 +96,21 @@ longdata |>
   pivot_wider(names_from = SubTopic, values_from = Data_Value)
 ```
 
-Convert variables to numeric or factors and store results.
+Convert variables to numeric or factors, give variables nice names, and store results.
 
 ```{r}
 CDC <- longdata |>
   select(-c("SubTopicId")) |>
   pivot_wider(names_from = SubTopic, values_from = Data_Value) |>
   mutate(across(`Total cycles`:`Total infants born`, as.numeric)) |>
-  mutate(across(`Donor egg services`:`Verified lab accreditation`, as.factor))
+  mutate(across(`Donor egg services`:`Verified lab accreditation`, as.factor)) |>
+  mutate(`Clinic Status` = as.factor(`Clinic Status`)) |>
+  mutate(Year = as.factor(Year)) |>
+  rename(`State Abbreviation` = LocationAbbr,
+          State = LocationDesc,
+          `Facility Name` = FacilityName,
+          `Medical Director` = MedicalDirector,
+          `Zip Code` = Zipcode)
 
 #view results
 CDC
@@ -114,6 +121,8 @@ CDC |>
 CDC |>
   select(`Donor egg services`:`Verified lab accreditation`) #for testing
 
+str(CDC)
+
 #Save to rds file
 write_rds(CDC, "data/Cleaned CDC data.rds")
 ```
@@ -122,7 +131,7 @@ write_rds(CDC, "data/Cleaned CDC data.rds")
 
 ### One-Way Contingency Tables
 
-Use one-way contingency tables to display the number of clinics that fall within particular groups (as of a specific year).
+Use one-way contingency tables to display the number of clinics that fall within particular groups.
 
 ```{r}
 CDC |>
@@ -138,7 +147,7 @@ CDC |>
 
 ### Two-Way Contingency Tables
 
-Use two-way contingency tables to display the number of clinics that fall within particular groups (as of a specific year).
+Use two-way contingency tables to display the number of clinics that fall within particular groups.
 
 ```{r}
 CDC |>
@@ -150,19 +159,18 @@ CDC |>
 
 ### Numerical Summaries
 
-Numerical summaries (means, medians, sds, etc.) for quantitative variables at levels of categorical variables (as of a specific year).
+Numerical summaries (means, medians, sds, etc.) of a quantitative variable at levels of a categorical variable.
 
 ```{r}
 CDC |>
   filter(Year == 2022) |>
   group_by(`Gestational carrier services`) |>
-  summarize(count = n(),
-            across(c(Deliveries, `Total infants born`),
-            list("mean" = ~ mean(.x, na.rm = TRUE),
-                 "median" = ~ median(.x, na.rm = TRUE),
-                 "sd" = ~ sd(.x, na.rm = TRUE),
-                 "IQR" = ~ IQR(.x, na.rm = TRUE)),
-            .names = "{.fn}_{.col}"))
+  summarize(Sum = sum(`Total infants born`, na.rm = TRUE),
+            `Mean (Per Clinic Per Year)` = mean(`Total infants born`, na.rm = TRUE),
+            `Median (Per Clinic Per Year)` = median(`Total infants born`, na.rm = TRUE),
+            `Standard Deviation (Per Clinic Per Year)` = sd(`Total infants born`, na.rm = TRUE),
+            `Inter-Quartile Range (Per Clinic Per Year)` = IQR(`Total infants born`, na.rm = TRUE))
+
 ```
 
 ### Plot 1: Bar Chart
@@ -194,10 +202,10 @@ ggplot(data = CDC |>
 
 ggplot(data = CDC |>
          filter(Year == 2022,
-                LocationDesc %in% c("New York",
+                State %in% c("New York",
                                     "California",
                                     "North Carolina")),
-       aes(x = LocationDesc, y = Pregnancies, fill = LocationDesc)) +
+       aes(x = State, y = Pregnancies, fill = State)) +
   geom_boxplot() +
   theme_light()
 
@@ -208,12 +216,12 @@ ggplot(data = CDC |>
 ```{r}
 ggplot(data = CDC |>
          filter(Year == 2022,
-                LocationDesc %in% c("New York",
+                State %in% c("New York",
                                     "California",
                                     "North Carolina"),
                 `Total cycles` < 10000) |>
          drop_na(`Total cycles`, Pregnancies),
-       aes(x = `Total cycles`, y = Pregnancies, color = LocationDesc)) +
+       aes(x = `Total cycles`, y = Pregnancies, color = State)) +
   geom_point() +
   geom_smooth(method = lm) + 
   theme_light()
@@ -237,7 +245,7 @@ ggplot(data = CDC |>
 plot_usmap(data = CDC |>
              filter(Year == 2022) |>
              drop_na(Pregnancies) |>
-             rename(state = LocationAbbr) |>
+             rename(state = State) |>
              group_by(state) |>
              summarize(Pregnancies = sum(Pregnancies)),
            values = "Pregnancies",

@@ -395,37 +395,44 @@ TOP01
 #   `Egg cryopreservation services` &lt;chr&gt;, …</code></pre>
 </div>
 </div>
-<p>Convert variables to numeric or factors and store results.</p>
+<p>Convert variables to numeric or factors, give variables nice names, and store results.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>CDC <span class="ot">&lt;-</span> longdata <span class="sc">|&gt;</span></span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(<span class="st">"SubTopicId"</span>)) <span class="sc">|&gt;</span></span>
 <span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> SubTopic, <span class="at">values_from =</span> Data_Value) <span class="sc">|&gt;</span></span>
 <span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="st">`</span><span class="at">Total cycles</span><span class="st">`</span><span class="sc">:</span><span class="st">`</span><span class="at">Total infants born</span><span class="st">`</span>, as.numeric)) <span class="sc">|&gt;</span></span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="st">`</span><span class="at">Donor egg services</span><span class="st">`</span><span class="sc">:</span><span class="st">`</span><span class="at">Verified lab accreditation</span><span class="st">`</span>, as.factor))</span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="co">#view results</span></span>
-<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>CDC</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="st">`</span><span class="at">Donor egg services</span><span class="st">`</span><span class="sc">:</span><span class="st">`</span><span class="at">Verified lab accreditation</span><span class="st">`</span>, as.factor)) <span class="sc">|&gt;</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="st">`</span><span class="at">Clinic Status</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">as.factor</span>(<span class="st">`</span><span class="at">Clinic Status</span><span class="st">`</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Year =</span> <span class="fu">as.factor</span>(Year)) <span class="sc">|&gt;</span></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="st">`</span><span class="at">State Abbreviation</span><span class="st">`</span> <span class="ot">=</span> LocationAbbr,</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>          <span class="at">State =</span> LocationDesc,</span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>          <span class="st">`</span><span class="at">Facility Name</span><span class="st">`</span> <span class="ot">=</span> FacilityName,</span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>          <span class="st">`</span><span class="at">Medical Director</span><span class="st">`</span> <span class="ot">=</span> MedicalDirector,</span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>          <span class="st">`</span><span class="at">Zip Code</span><span class="st">`</span> <span class="ot">=</span> Zipcode)</span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a><span class="co">#view results</span></span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>CDC</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 1,413 × 24
-    Year LocationAbbr LocationDesc  FacilityName   MedicalDirector Address City 
-   &lt;dbl&gt; &lt;chr&gt;        &lt;chr&gt;         &lt;chr&gt;          &lt;chr&gt;           &lt;chr&gt;   &lt;chr&gt;
- 1  2020 FL           Florida       Florida Ferti… Mark D. Sanche… 2454 N… Clea…
- 2  2020 WA           Washington    Overlake Repr… Kevin M. Johns… 11232 … Bell…
- 3  2020 CO           Colorado      Colorado Repr… Susan  Trout, … 4600 E… Denv…
- 4  2020 NY           New York      Boston IVF, T… Sonia  Elguero… 399 Al… Loud…
- 5  2020 TX           Texas         Brooke Army M… Belinda J. Yau… Depart… Fort…
- 6  2020 IL           Illinois      Carle Foundat… Nancy  Fay, MD  1818 E… Urba…
- 7  2020 CA           California    The Fertility… Edward J. Rami… 9833 B… Mont…
- 8  2020 TX           Texas         Austin Fertil… Kenneth K. Mog… 2200 P… Aust…
- 9  2020 NJ           New Jersey    Institute for… Margaret G. Ga… 94 Old… Livi…
-10  2020 WV           West Virginia Cabell Huntin… William N. Bur… 1600 M… Hunt…
+   Year  `State Abbreviation` State   `Facility Name` `Medical Director` Address
+   &lt;fct&gt; &lt;chr&gt;                &lt;chr&gt;   &lt;chr&gt;           &lt;chr&gt;              &lt;chr&gt;  
+ 1 2020  FL                   Florida Florida Fertil… Mark D. Sanchez, … 2454 N…
+ 2 2020  WA                   Washin… Overlake Repro… Kevin M. Johnson,… 11232 …
+ 3 2020  CO                   Colora… Colorado Repro… Susan  Trout, MD   4600 E…
+ 4 2020  NY                   New Yo… Boston IVF, Th… Sonia  Elguero, MD 399 Al…
+ 5 2020  TX                   Texas   Brooke Army Me… Belinda J. Yauger… Depart…
+ 6 2020  IL                   Illino… Carle Foundati… Nancy  Fay, MD     1818 E…
+ 7 2020  CA                   Califo… The Fertility … Edward J. Ramirez… 9833 B…
+ 8 2020  TX                   Texas   Austin Fertili… Kenneth K. Moghad… 2200 P…
+ 9 2020  NJ                   New Je… Institute for … Margaret G. Garri… 94 Old…
+10 2020  WV                   West V… Cabell Hunting… William N. Burns,… 1600 M…
 # ℹ 1,403 more rows
-# ℹ 17 more variables: Zipcode &lt;chr&gt;, Phone &lt;chr&gt;, `Clinic Status` &lt;chr&gt;,
-#   ClinicId &lt;dbl&gt;, Geolocation &lt;chr&gt;, `Total cycles` &lt;dbl&gt;,
-#   `Fertility preservation cycles` &lt;dbl&gt;, Pregnancies &lt;dbl&gt;, Deliveries &lt;dbl&gt;,
-#   `Total infants born` &lt;dbl&gt;, `Donor egg services` &lt;fct&gt;,
-#   `Donated embryo services` &lt;fct&gt;, `Embryo cryopreservation services` &lt;fct&gt;,
-#   `Egg cryopreservation services` &lt;fct&gt;, …</code></pre>
+# ℹ 18 more variables: City &lt;chr&gt;, `Zip Code` &lt;chr&gt;, Phone &lt;chr&gt;,
+#   `Clinic Status` &lt;fct&gt;, ClinicId &lt;dbl&gt;, Geolocation &lt;chr&gt;,
+#   `Total cycles` &lt;dbl&gt;, `Fertility preservation cycles` &lt;dbl&gt;,
+#   Pregnancies &lt;dbl&gt;, Deliveries &lt;dbl&gt;, `Total infants born` &lt;dbl&gt;,
+#   `Donor egg services` &lt;fct&gt;, `Donated embryo services` &lt;fct&gt;,
+#   `Embryo cryopreservation services` &lt;fct&gt;, …</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>CDC <span class="sc">|&gt;</span></span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="st">`</span><span class="at">Total cycles</span><span class="st">`</span><span class="sc">:</span><span class="st">`</span><span class="at">Total infants born</span><span class="st">`</span>) <span class="co">#for testing</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -468,8 +475,36 @@ TOP01
 #   `Gestational carrier services` &lt;fct&gt;, `SART member` &lt;fct&gt;,
 #   `Verified lab accreditation` &lt;fct&gt;</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Save to rds file</span></span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="fu">write_rds</span>(CDC, <span class="st">"data/Cleaned CDC data.rds"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(CDC)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>tibble [1,413 × 24] (S3: tbl_df/tbl/data.frame)
+ $ Year                            : Factor w/ 3 levels "2020","2021",..: 1 1 1 1 1 1 1 1 1 1 ...
+ $ State Abbreviation              : chr [1:1413] "FL" "WA" "CO" "NY" ...
+ $ State                           : chr [1:1413] "Florida" "Washington" "Colorado" "New York" ...
+ $ Facility Name                   : chr [1:1413] "Florida Fertility Institute" "Overlake Reproductive Health, Inc., PS" "Colorado Reproductive Endocrinology" "Boston IVF, The Albany Center" ...
+ $ Medical Director                : chr [1:1413] "Mark D. Sanchez, MD" "Kevin M. Johnson, MD" "Susan  Trout, MD" "Sonia  Elguero, MD" ...
+ $ Address                         : chr [1:1413] "2454 N. McMullen Booth Rd, Suite 601" "11232 N.E. 15th St, Suite 201" "4600 E. Hale Pkwy, Suite 350" "399 Albany Shaker Rd" ...
+ $ City                            : chr [1:1413] "Clearwater" "Bellevue" "Denver" "Loudonville" ...
+ $ Zip Code                        : chr [1:1413] "33759" "98004" "80220" "12211" ...
+ $ Phone                           : chr [1:1413] "(727) 669-3414" "(425) 646-4700" "(303) 321-7115" "(518) 434-9759" ...
+ $ Clinic Status                   : Factor w/ 4 levels "Closed","Non-reporter",..: 3 3 3 3 4 4 3 3 3 3 ...
+ $ ClinicId                        : num [1:1413] 383 96 150 507 289 844 356 112 54 493 ...
+ $ Geolocation                     : chr [1:1413] "POINT (-82.7074751 28.0103991)" "POINT (-122.1893912 47.6244604)" "POINT (-104.9344136 39.7327454)" "POINT (-73.7675463 42.697359)" ...
+ $ Total cycles                    : num [1:1413] 376 420 169 740 140 31 71 354 2010 44 ...
+ $ Fertility preservation cycles   : num [1:1413] 11 NA 9 19 NA 0 0 13 148 NA ...
+ $ Pregnancies                     : num [1:1413] 107 123 33 184 47 NA 22 105 522 24 ...
+ $ Deliveries                      : num [1:1413] 86 97 24 159 35 NA 20 93 446 19 ...
+ $ Total infants born              : num [1:1413] 94 98 27 167 38 NA 22 94 453 26 ...
+ $ Donor egg services              : Factor w/ 2 levels "No","Yes": 2 2 2 1 1 1 2 2 2 2 ...
+ $ Donated embryo services         : Factor w/ 2 levels "No","Yes": 1 2 2 1 1 1 2 1 1 1 ...
+ $ Embryo cryopreservation services: Factor w/ 1 level "Yes": 1 1 1 1 1 1 1 1 1 1 ...
+ $ Egg cryopreservation services   : Factor w/ 2 levels "No","Yes": 2 2 2 2 2 2 2 2 2 2 ...
+ $ Gestational carrier services    : Factor w/ 2 levels "No","Yes": 2 2 2 1 1 1 2 2 2 1 ...
+ $ SART member                     : Factor w/ 2 levels "No","Yes": 2 1 2 2 2 2 1 2 2 1 ...
+ $ Verified lab accreditation      : Factor w/ 3 levels "No","Pending",..: 3 3 3 3 3 3 1 3 3 3 ...</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Save to rds file</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="fu">write_rds</span>(CDC, <span class="st">"data/Cleaned CDC data.rds"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 </section>
@@ -477,12 +512,12 @@ TOP01
 <h2 class="anchored" data-anchor-id="data-investigation">Data Investigation</h2>
 <section id="one-way-contingency-tables" class="level3">
 <h3 class="anchored" data-anchor-id="one-way-contingency-tables">One-Way Contingency Tables</h3>
-<p>Use one-way contingency tables to display the number of clinics that fall within particular groups (as of a specific year).</p>
+<p>Use one-way contingency tables to display the number of clinics that fall within particular groups.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>CDC <span class="sc">|&gt;</span></span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Year <span class="sc">==</span> <span class="dv">2022</span>) <span class="sc">|&gt;</span></span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(<span class="st">`</span><span class="at">Donor egg services</span><span class="st">`</span>) <span class="sc">|&gt;</span></span>
-<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">count =</span> <span class="fu">n</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>CDC <span class="sc">|&gt;</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Year <span class="sc">==</span> <span class="dv">2022</span>) <span class="sc">|&gt;</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(<span class="st">`</span><span class="at">Donor egg services</span><span class="st">`</span>) <span class="sc">|&gt;</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">count =</span> <span class="fu">n</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 3 × 2
   `Donor egg services` count
@@ -491,14 +526,14 @@ TOP01
 2 Yes                    404
 3 &lt;NA&gt;                    54</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>CDC <span class="sc">|&gt;</span></span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Year <span class="sc">==</span> <span class="dv">2022</span>) <span class="sc">|&gt;</span></span>
-<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(<span class="st">`</span><span class="at">Clinic Status</span><span class="st">`</span>) <span class="sc">|&gt;</span></span>
-<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">count =</span> <span class="fu">n</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>CDC <span class="sc">|&gt;</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Year <span class="sc">==</span> <span class="dv">2022</span>) <span class="sc">|&gt;</span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(<span class="st">`</span><span class="at">Clinic Status</span><span class="st">`</span>) <span class="sc">|&gt;</span></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">count =</span> <span class="fu">n</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 4 × 2
   `Clinic Status` count
-  &lt;chr&gt;           &lt;int&gt;
+  &lt;fct&gt;           &lt;int&gt;
 1 Closed              5
 2 Non-reporter       54
 3 Open              422
@@ -508,13 +543,13 @@ TOP01
 </section>
 <section id="two-way-contingency-tables" class="level3">
 <h3 class="anchored" data-anchor-id="two-way-contingency-tables">Two-Way Contingency Tables</h3>
-<p>Use two-way contingency tables to display the number of clinics that fall within particular groups (as of a specific year).</p>
+<p>Use two-way contingency tables to display the number of clinics that fall within particular groups.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>CDC <span class="sc">|&gt;</span></span>
-<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Year <span class="sc">==</span> <span class="dv">2022</span>) <span class="sc">|&gt;</span></span>
-<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(<span class="st">`</span><span class="at">Donor egg services</span><span class="st">`</span>, <span class="st">`</span><span class="at">Clinic Status</span><span class="st">`</span>) <span class="sc">|&gt;</span></span>
-<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">count =</span> <span class="fu">n</span>()) <span class="sc">|&gt;</span></span>
-<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> <span class="st">`</span><span class="at">Clinic Status</span><span class="st">`</span>, <span class="at">values_from =</span> count)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>CDC <span class="sc">|&gt;</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Year <span class="sc">==</span> <span class="dv">2022</span>) <span class="sc">|&gt;</span></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(<span class="st">`</span><span class="at">Donor egg services</span><span class="st">`</span>, <span class="st">`</span><span class="at">Clinic Status</span><span class="st">`</span>) <span class="sc">|&gt;</span></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">count =</span> <span class="fu">n</span>()) <span class="sc">|&gt;</span></span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> <span class="st">`</span><span class="at">Clinic Status</span><span class="st">`</span>, <span class="at">values_from =</span> count)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>`summarise()` has regrouped the output.
 ℹ Summaries were computed grouped by Donor egg services and Clinic Status.
@@ -536,40 +571,38 @@ TOP01
 </section>
 <section id="numerical-summaries" class="level3">
 <h3 class="anchored" data-anchor-id="numerical-summaries">Numerical Summaries</h3>
-<p>Numerical summaries (means, medians, sds, etc.) for quantitative variables at levels of categorical variables (as of a specific year).</p>
+<p>Numerical summaries (means, medians, sds, etc.) of a quantitative variable at levels of a categorical variable.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>CDC <span class="sc">|&gt;</span></span>
-<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Year <span class="sc">==</span> <span class="dv">2022</span>) <span class="sc">|&gt;</span></span>
-<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(<span class="st">`</span><span class="at">Gestational carrier services</span><span class="st">`</span>) <span class="sc">|&gt;</span></span>
-<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">count =</span> <span class="fu">n</span>(),</span>
-<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>            <span class="fu">across</span>(<span class="fu">c</span>(Deliveries, <span class="st">`</span><span class="at">Total infants born</span><span class="st">`</span>),</span>
-<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>            <span class="fu">list</span>(<span class="st">"mean"</span> <span class="ot">=</span> <span class="er">~</span> <span class="fu">mean</span>(.x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>                 <span class="st">"median"</span> <span class="ot">=</span> <span class="er">~</span> <span class="fu">median</span>(.x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>                 <span class="st">"sd"</span> <span class="ot">=</span> <span class="er">~</span> <span class="fu">sd</span>(.x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>                 <span class="st">"IQR"</span> <span class="ot">=</span> <span class="er">~</span> <span class="fu">IQR</span>(.x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)),</span>
-<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a>            <span class="at">.names =</span> <span class="st">"{.fn}_{.col}"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>CDC <span class="sc">|&gt;</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Year <span class="sc">==</span> <span class="dv">2022</span>) <span class="sc">|&gt;</span></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(<span class="st">`</span><span class="at">Gestational carrier services</span><span class="st">`</span>) <span class="sc">|&gt;</span></span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">Sum =</span> <span class="fu">sum</span>(<span class="st">`</span><span class="at">Total infants born</span><span class="st">`</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>            <span class="st">`</span><span class="at">Mean (Per Clinic Per Year)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">mean</span>(<span class="st">`</span><span class="at">Total infants born</span><span class="st">`</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>            <span class="st">`</span><span class="at">Median (Per Clinic Per Year)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">median</span>(<span class="st">`</span><span class="at">Total infants born</span><span class="st">`</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>            <span class="st">`</span><span class="at">Standard Deviation (Per Clinic Per Year)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sd</span>(<span class="st">`</span><span class="at">Total infants born</span><span class="st">`</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>            <span class="st">`</span><span class="at">Inter-Quartile Range (Per Clinic Per Year)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">IQR</span>(<span class="st">`</span><span class="at">Total infants born</span><span class="st">`</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 3 × 10
-  Gestational carrier se…¹ count mean_Deliveries median_Deliveries sd_Deliveries
-  &lt;fct&gt;                    &lt;int&gt;           &lt;dbl&gt;             &lt;dbl&gt;         &lt;dbl&gt;
-1 No                          44            57.5               40           49.3
-2 Yes                        413           225.               126.         326. 
-3 &lt;NA&gt;                        54           NaN                 NA           NA  
-# ℹ abbreviated name: ¹​`Gestational carrier services`
-# ℹ 5 more variables: IQR_Deliveries &lt;dbl&gt;, `mean_Total infants born` &lt;dbl&gt;,
-#   `median_Total infants born` &lt;dbl&gt;, `sd_Total infants born` &lt;dbl&gt;,
-#   `IQR_Total infants born` &lt;dbl&gt;</code></pre>
+<pre><code># A tibble: 3 × 6
+  Gestational carrier serv…¹   Sum Mean (Per Clinic Per…² Median (Per Clinic P…³
+  &lt;fct&gt;                      &lt;dbl&gt;                  &lt;dbl&gt;                  &lt;dbl&gt;
+1 No                          2706                   62.9                    42 
+2 Yes                        95563                  235.                    134.
+3 &lt;NA&gt;                           0                  NaN                      NA 
+# ℹ abbreviated names: ¹​`Gestational carrier services`,
+#   ²​`Mean (Per Clinic Per Year)`, ³​`Median (Per Clinic Per Year)`
+# ℹ 2 more variables: `Standard Deviation (Per Clinic Per Year)` &lt;dbl&gt;,
+#   `Inter-Quartile Range (Per Clinic Per Year)` &lt;dbl&gt;</code></pre>
 </div>
 </div>
 </section>
 <section id="plot-1-bar-chart" class="level3">
 <h3 class="anchored" data-anchor-id="plot-1-bar-chart">Plot 1: Bar Chart</h3>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> CDC,</span>
-<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x =</span> Year, <span class="at">fill =</span> <span class="st">`</span><span class="at">Gestational carrier services</span><span class="st">`</span>)) <span class="sc">+</span></span>
-<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>() <span class="sc">+</span></span>
-<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Number of Clinics"</span>) <span class="sc">+</span></span>
-<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_light</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> CDC,</span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x =</span> Year, <span class="at">fill =</span> <span class="st">`</span><span class="at">Gestational carrier services</span><span class="st">`</span>)) <span class="sc">+</span></span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>() <span class="sc">+</span></span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Number of Clinics"</span>) <span class="sc">+</span></span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_light</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -582,12 +615,12 @@ TOP01
 <section id="plot-2-smoothed-histogram" class="level3">
 <h3 class="anchored" data-anchor-id="plot-2-smoothed-histogram">Plot 2: Smoothed Histogram</h3>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> CDC <span class="sc">|&gt;</span></span>
-<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>         <span class="fu">filter</span>(Year <span class="sc">==</span> <span class="dv">2022</span>, Pregnancies <span class="sc">&lt;</span> <span class="dv">1500</span>) <span class="sc">|&gt;</span></span>
-<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>         <span class="fu">drop_na</span>(Pregnancies)) <span class="sc">+</span></span>
-<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="fu">aes</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>, <span class="at">x =</span> Pregnancies,</span>
-<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>                   <span class="at">fill =</span> <span class="st">`</span><span class="at">Gestational carrier services</span><span class="st">`</span>)) <span class="sc">+</span></span>
-<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_light</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> CDC <span class="sc">|&gt;</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>         <span class="fu">filter</span>(Year <span class="sc">==</span> <span class="dv">2022</span>, Pregnancies <span class="sc">&lt;</span> <span class="dv">1500</span>) <span class="sc">|&gt;</span></span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>         <span class="fu">drop_na</span>(Pregnancies)) <span class="sc">+</span></span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="fu">aes</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>, <span class="at">x =</span> Pregnancies,</span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>                   <span class="at">fill =</span> <span class="st">`</span><span class="at">Gestational carrier services</span><span class="st">`</span>)) <span class="sc">+</span></span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_light</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -600,14 +633,14 @@ TOP01
 <section id="plot-3-box-plot" class="level3">
 <h3 class="anchored" data-anchor-id="plot-3-box-plot">Plot 3: Box Plot</h3>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> CDC <span class="sc">|&gt;</span></span>
-<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>         <span class="fu">filter</span>(Year <span class="sc">==</span> <span class="dv">2022</span>,</span>
-<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>                LocationDesc <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"New York"</span>,</span>
-<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>                                    <span class="st">"California"</span>,</span>
-<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>                                    <span class="st">"North Carolina"</span>)),</span>
-<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x =</span> LocationDesc, <span class="at">y =</span> Pregnancies, <span class="at">fill =</span> LocationDesc)) <span class="sc">+</span></span>
-<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
-<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_light</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> CDC <span class="sc">|&gt;</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>         <span class="fu">filter</span>(Year <span class="sc">==</span> <span class="dv">2022</span>,</span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>                State <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"New York"</span>,</span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>                                    <span class="st">"California"</span>,</span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>                                    <span class="st">"North Carolina"</span>)),</span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x =</span> State, <span class="at">y =</span> Pregnancies, <span class="at">fill =</span> State)) <span class="sc">+</span></span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_light</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: Removed 20 rows containing non-finite outside the scale range
 (`stat_boxplot()`).</code></pre>
@@ -624,17 +657,17 @@ TOP01
 <section id="plot-4-scatter-plot" class="level3">
 <h3 class="anchored" data-anchor-id="plot-4-scatter-plot">Plot 4: Scatter Plot</h3>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> CDC <span class="sc">|&gt;</span></span>
-<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>         <span class="fu">filter</span>(Year <span class="sc">==</span> <span class="dv">2022</span>,</span>
-<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>                LocationDesc <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"New York"</span>,</span>
-<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>                                    <span class="st">"California"</span>,</span>
-<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>                                    <span class="st">"North Carolina"</span>),</span>
-<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>                <span class="st">`</span><span class="at">Total cycles</span><span class="st">`</span> <span class="sc">&lt;</span> <span class="dv">10000</span>) <span class="sc">|&gt;</span></span>
-<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a>         <span class="fu">drop_na</span>(<span class="st">`</span><span class="at">Total cycles</span><span class="st">`</span>, Pregnancies),</span>
-<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x =</span> <span class="st">`</span><span class="at">Total cycles</span><span class="st">`</span>, <span class="at">y =</span> Pregnancies, <span class="at">color =</span> LocationDesc)) <span class="sc">+</span></span>
-<span id="cb47-9"><a href="#cb47-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb47-10"><a href="#cb47-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> lm) <span class="sc">+</span> </span>
-<span id="cb47-11"><a href="#cb47-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_light</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> CDC <span class="sc">|&gt;</span></span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>         <span class="fu">filter</span>(Year <span class="sc">==</span> <span class="dv">2022</span>,</span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>                State <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"New York"</span>,</span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>                                    <span class="st">"California"</span>,</span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>                                    <span class="st">"North Carolina"</span>),</span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a>                <span class="st">`</span><span class="at">Total cycles</span><span class="st">`</span> <span class="sc">&lt;</span> <span class="dv">10000</span>) <span class="sc">|&gt;</span></span>
+<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a>         <span class="fu">drop_na</span>(<span class="st">`</span><span class="at">Total cycles</span><span class="st">`</span>, Pregnancies),</span>
+<span id="cb49-8"><a href="#cb49-8" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x =</span> <span class="st">`</span><span class="at">Total cycles</span><span class="st">`</span>, <span class="at">y =</span> Pregnancies, <span class="at">color =</span> State)) <span class="sc">+</span></span>
+<span id="cb49-9"><a href="#cb49-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb49-10"><a href="#cb49-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> lm) <span class="sc">+</span> </span>
+<span id="cb49-11"><a href="#cb49-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_light</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>`geom_smooth()` using formula = 'y ~ x'</code></pre>
 </div>
@@ -650,13 +683,13 @@ TOP01
 <section id="plot-5-faceted-smooth-histogram" class="level3">
 <h3 class="anchored" data-anchor-id="plot-5-faceted-smooth-histogram">Plot 5: Faceted Smooth Histogram</h3>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> CDC <span class="sc">|&gt;</span></span>
-<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>         <span class="fu">filter</span>(Pregnancies <span class="sc">&lt;</span> <span class="dv">1500</span>) <span class="sc">|&gt;</span></span>
-<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>         <span class="fu">drop_na</span>(Pregnancies)) <span class="sc">+</span></span>
-<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="fu">aes</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>, <span class="at">x =</span> Pregnancies,</span>
-<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>                   <span class="at">fill =</span> <span class="st">`</span><span class="at">Gestational carrier services</span><span class="st">`</span>)) <span class="sc">+</span></span>
-<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> Year) <span class="sc">+</span></span>
-<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_light</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> CDC <span class="sc">|&gt;</span></span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>         <span class="fu">filter</span>(Pregnancies <span class="sc">&lt;</span> <span class="dv">1500</span>) <span class="sc">|&gt;</span></span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>         <span class="fu">drop_na</span>(Pregnancies)) <span class="sc">+</span></span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="fu">aes</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>, <span class="at">x =</span> Pregnancies,</span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a>                   <span class="at">fill =</span> <span class="st">`</span><span class="at">Gestational carrier services</span><span class="st">`</span>)) <span class="sc">+</span></span>
+<span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> Year) <span class="sc">+</span></span>
+<span id="cb51-7"><a href="#cb51-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_light</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -669,15 +702,15 @@ TOP01
 <section id="plot-6-map" class="level3">
 <h3 class="anchored" data-anchor-id="plot-6-map">Plot 6: Map</h3>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_usmap</span>(<span class="at">data =</span> CDC <span class="sc">|&gt;</span></span>
-<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>             <span class="fu">filter</span>(Year <span class="sc">==</span> <span class="dv">2022</span>) <span class="sc">|&gt;</span></span>
-<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>             <span class="fu">drop_na</span>(Pregnancies) <span class="sc">|&gt;</span></span>
-<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>             <span class="fu">rename</span>(<span class="at">state =</span> LocationAbbr) <span class="sc">|&gt;</span></span>
-<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a>             <span class="fu">group_by</span>(state) <span class="sc">|&gt;</span></span>
-<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a>             <span class="fu">summarize</span>(<span class="at">Pregnancies =</span> <span class="fu">sum</span>(Pregnancies)),</span>
-<span id="cb50-7"><a href="#cb50-7" aria-hidden="true" tabindex="-1"></a>           <span class="at">values =</span> <span class="st">"Pregnancies"</span>,</span>
-<span id="cb50-8"><a href="#cb50-8" aria-hidden="true" tabindex="-1"></a>           <span class="at">regions =</span> <span class="st">"states"</span>) <span class="sc">+</span></span>
-<span id="cb50-9"><a href="#cb50-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_continuous</span>(<span class="at">low =</span> <span class="st">"white"</span>, <span class="at">high =</span> <span class="st">"red"</span>, <span class="at">name =</span> <span class="st">"Pregnancies"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_usmap</span>(<span class="at">data =</span> CDC <span class="sc">|&gt;</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>             <span class="fu">filter</span>(Year <span class="sc">==</span> <span class="dv">2022</span>) <span class="sc">|&gt;</span></span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>             <span class="fu">drop_na</span>(Pregnancies) <span class="sc">|&gt;</span></span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>             <span class="fu">rename</span>(<span class="at">state =</span> State) <span class="sc">|&gt;</span></span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a>             <span class="fu">group_by</span>(state) <span class="sc">|&gt;</span></span>
+<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a>             <span class="fu">summarize</span>(<span class="at">Pregnancies =</span> <span class="fu">sum</span>(Pregnancies)),</span>
+<span id="cb52-7"><a href="#cb52-7" aria-hidden="true" tabindex="-1"></a>           <span class="at">values =</span> <span class="st">"Pregnancies"</span>,</span>
+<span id="cb52-8"><a href="#cb52-8" aria-hidden="true" tabindex="-1"></a>           <span class="at">regions =</span> <span class="st">"states"</span>) <span class="sc">+</span></span>
+<span id="cb52-9"><a href="#cb52-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_continuous</span>(<span class="at">low =</span> <span class="st">"white"</span>, <span class="at">high =</span> <span class="st">"red"</span>, <span class="at">name =</span> <span class="st">"Pregnancies"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">

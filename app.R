@@ -9,36 +9,47 @@ CDC <- readRDS("data/Cleaned CDC data.rds")
 
 # State options
 states <- CDC |>
-  distinct(LocationDesc) |>
-  arrange(LocationDesc)
+  distinct(State) |>
+  arrange(State)
 
-states <- c("All States", states$LocationDesc)
+states <- c("All States", states$State)
 
 # City options
 cities <- CDC |>
-  distinct(LocationDesc, City) |>
-  arrange(LocationDesc, City)
+  distinct(State, City) |>
+  arrange(State, City)
 
-# Numeric variable options for filtering
-numvar_options <- c('Total cycles',
+# Numeric variable options for filtering with sliders
+slider_options <- c('Total cycles',
                     'Fertility preservation cycles',
                     'Pregnancies',
                     'Deliveries',
                     'Total infants born')
 
-numvar_range = list()
+slider_range = list()
 for (i in 1:5){
-  numvar_range[[i]] <- quantile(CDC[numvar_options[i]],
+  slider_range[[i]] <- quantile(CDC[slider_options[i]],
                               probs = c(0, 1),
                               na.rm = TRUE)
   
 }
 
+# Numeric variable options for numeric summaries and plots
+numvar_options <- c('Number of Records (One Record Per Clinic Per Year)',
+                    'Total cycles',
+                    'Fertility preservation cycles',
+                    'Pregnancies',
+                    'Deliveries',
+                    'Total infants born',
+                    'Ratio of Pregnancies to Total cycles',
+                    'Ratio of Deliveries to Pregnancies',
+                    'Ratio of Total infants born to Deliveries')
+
 # Character variable options for tables and plots
 charvar_options <- c('Year',
-                     'LocationDesc',
-                     'FacilityName',
-                     'MedicalDirector',
+                     'State',
+                     'Facility Name',
+                     'Medical Director',
                      'City',
                      'Clinic Status',
                      'Donor egg services',
@@ -79,21 +90,21 @@ ui <- fluidPage(
                      choices = "All Cities",
                      selected = "All Cities"),
       
-      checkboxGroupInput(inputId = "numeric_vars",
-                         label = "Select Numeric Variables to Filter By:",
-                         choices = numvar_options,
+      checkboxGroupInput(inputId = "slider_vars",
+                         label = "Select Numeric Variables to Filter Records By (One Record Per Clinic Per Year):",
+                         choices = slider_options,
                          selected = NULL),
       
       # Sliders that conditionally appear based on checkboxes
       lapply(1:5, function(i){
         conditionalPanel(
-          condition = paste0("input.numeric_vars.includes('", numvar_options[i], "')"),
-          sliderInput(inputId = numvar_options[i],
-                        label = numvar_options[i],
-                        min = numvar_range[[i]][[1]], #defaults to min of unfiltered data
-                        max = numvar_range[[i]][[2]], #defaults to max of unfiltered data
-                        value = c(numvar_range[[i]][[1]],
-                                  numvar_range[[i]][[2]]))
+          condition = paste0("input.slider_vars.includes('", slider_options[i], "')"),
+          sliderInput(inputId = slider_options[i],
+                        label = slider_options[i],
+                        min = slider_range[[i]][[1]], #defaults to min of unfiltered data
+                        max = slider_range[[i]][[2]], #defaults to max of unfiltered data
+                        value = c(slider_range[[i]][[1]],
+                                  slider_range[[i]][[2]]))
         )
       })
       
@@ -114,20 +125,40 @@ ui <- fluidPage(
                    
                    tabPanel("One and Two-Way Contingency Tables",
                             br(),
-                            selectizeInput(inputId = "contingency1",
+                            fluidRow(
+                            column(6, selectizeInput(inputId = "contingency1",
                                   label = "Select First Categorical Variable:",
-                                  choices = charvar_options[-2],
-                                  selected = charvar_options[1]),
-                            selectizeInput(inputId = "contingency2",
+                                  choices = charvar_options,
+                                  selected = charvar_options[1])),
+                            column(6, selectizeInput(inputId = "contingency2",
                                   label = "Select Second Categorical Variable:",
-                                  choices = charvar_options[-1],
-                                  selected = charvar_options[2]),
-                            tableOutput("contingencytable1"),
-                            tableOutput("contingencytable2"),
+                                  choices = charvar_options,
+                                  selected = charvar_options[2])),
+                            ),
+                            h4("One-Way Contingency Tables:"),
+                            fluidRow(
+                            column(6, tableOutput("contingencytable1")),
+                            column(6, tableOutput("contingencytable2"))
+                            ),
+                            h4("Two-Way Contingency Table:"),
                             tableOutput("contingencytable1and2")
                             ),
                    
-                   tabPanel("Numeric Data Summaries"),
+                   tabPanel("Numeric Data Summaries",
+                            br(),
+                            fluidRow(
+                              column(6, selectizeInput(inputId = "numericsummary1",
+                                    label = "Select Categorical Variable:",
+                                    choices = charvar_options,
+                                    selected = charvar_options[1])),
+                              column(6, selectizeInput(inputId = "numericsummary2",
+                                    label = "Select Numeric Variable:",
+                                    choices = numvar_options,
+                                    selected = numvar_options[1])),
+                            ),
+                            h4("Summary"),
+                            tableOutput("numeric_summary")
+                            ),
                    
                    tabPanel("Plots")
                  ))
@@ -150,7 +181,7 @@ server <- function(input, output, session) {
                            selected = "All Cities")
     }
     else{
-      city_choices <- cities |> filter(LocationDesc == input$state)
+      city_choices <- cities |> filter(State == input$state)
       city_choices <- c("All Cities", city_choices$City)
       updateSelectizeInput(session,
                            inputId = "city",
@@ -164,14 +195,14 @@ server <- function(input, output, session) {
   filterdata <- eventReactive(input$apply_filters, {
     df <- CDC |>
       filter(Year == input$year | input$year == "All Years") |>
-      filter(LocationDesc == input$state | input$state == "All States") |>
+      filter(State == input$state | input$state == "All States") |>
       filter(City == input$city | input$city == "All Cities")
     
     for (i in 1:5){
       df <- df |>
-        filter((get(numvar_options[i]) >= input[[numvar_options[i]]][1] &
-                  get(numvar_options[i]) <= input[[numvar_options[i]]][2])|
-                 !(numvar_options[i] %in% input$numeric_vars))
+        filter((get(slider_options[i]) >= input[[slider_options[i]]][1] &
+                  get(slider_options[i]) <= input[[slider_options[i]]][2])|
+                 !(slider_options[i] %in% input$slider_vars))
     }
     
     return(df)
@@ -226,6 +257,32 @@ server <- function(input, output, session) {
       pivot_wider(names_from = `get(input$contingency2)`, values_from = count)
     
     colnames(df)[1] <- input$contingency1
+    
+    return(df)
+  })
+  
+  # Numeric summary
+  output$numeric_summary <- renderTable({
+    df <- filterdata() |>
+      mutate(`Number of Records (One Record Per Clinic Per Year)` = 1,
+             `Ratio of Pregnancies to Total cycles` = if_else((`Total cycles` > 0), Pregnancies / `Total cycles`, NA),
+             `Ratio of Deliveries to Pregnancies` = if_else((Pregnancies > 0), Deliveries / Pregnancies, NA),
+             `Ratio of Total infants born to Deliveries` = if_else((Deliveries > 0), `Total infants born` / Deliveries, NA)) |>
+      group_by(get(input$numericsummary1)) |>
+      summarize(Sum = sum(get(input$numericsummary2), na.rm = TRUE),
+                `Mean (Per Clinic Per Year)` = mean(get(input$numericsummary2), na.rm = TRUE),
+                `Median (Per Clinic Per Year)` = median(get(input$numericsummary2), na.rm = TRUE),
+                `Standard Deviation (Per Clinic Per Year)` = sd(get(input$numericsummary2), na.rm = TRUE),
+                `Inter-Quartile Range (Per Clinic Per Year)` = IQR(get(input$numericsummary2), na.rm = TRUE))
+    
+    if (input$numericsummary2 %in% c('Ratio of Pregnancies to Total cycles',
+                                     'Ratio of Deliveries to Pregnancies',
+                                     'Ratio of Total infants born to Deliveries')){
+      df <- df |>
+        select(-c(Sum))
+    }
+    
+    colnames(df)[1] <- input$numericsummary1
     
     return(df)
   })
