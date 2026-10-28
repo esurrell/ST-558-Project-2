@@ -141,11 +141,11 @@ ui <- fluidPage(
                             column(3, selectizeInput(inputId = "contingency1",
                                   label = "Select First Categorical Variable:",
                                   choices = charvar_options,
-                                  selected = charvar_options[1])),
+                                  selected = "Year")),
                             column(3, selectizeInput(inputId = "contingency2",
                                   label = "Select Second Categorical Variable:",
                                   choices = charvar_options,
-                                  selected = charvar_options[2]))
+                                  selected = "Clinic Status"))
                             ),
                             h4("One-Way Contingency Tables"),
                             fluidRow(
@@ -182,15 +182,15 @@ ui <- fluidPage(
                                                         selectizeInput(inputId = "plot1_x",
                                                                        label = "X Axis",
                                                                        choices = charvar_options,
-                                                                       selected = charvar_options[1]),
+                                                                       selected = "Year"),
                                                         selectizeInput(inputId = "plot1_y",
                                                                        label = "Y Axis",
                                                                        choices = numvar_options,
-                                                                       selected = numvar_options[1]),
+                                                                       selected = "Pregnancies"),
                                                         selectizeInput(inputId = "plot1_fill",
                                                                        label = "Color By",
                                                                        choices = charvar_options,
-                                                                       selected = charvar_options[2])
+                                                                       selected = "Clinic Status")
                                                  ),
                                                  conditionalPanel(
                                                    condition = paste0("input.plot1_x == input.plot1_fill"),
@@ -208,11 +208,11 @@ ui <- fluidPage(
                                                  selectizeInput(inputId = "plot2_x",
                                                                 label = "X Axis",
                                                                 choices = numvar_options[-1],
-                                                                selected = numvar_options[2]),
+                                                                selected = "Pregnancies"),
                                                  selectizeInput(inputId = "plot2_color",
                                                                 label = "Color By",
                                                                 choices = charvar_options,
-                                                                selected = charvar_options[1])
+                                                                selected = "Gestatioinal carrier services")
                                                  ),
                                           column(9, plotOutput("plot2"))
                                         )
@@ -223,11 +223,11 @@ ui <- fluidPage(
                                                  selectizeInput(inputId = "plot3_x",
                                                                 label = "X Axis",
                                                                 choices = charvar_options,
-                                                                selected = charvar_options[1]),
+                                                                selected = "Year"),
                                                  selectizeInput(inputId = "plot3_y",
                                                                 label = "Y Axis",
                                                                 choices = numvar_options[-1],
-                                                                selected = numvar_options[2])
+                                                                selected = "Pregnancies")
                                           ),
                                           column(9, plotOutput("plot3"))
                                          )
@@ -238,15 +238,15 @@ ui <- fluidPage(
                                                  selectizeInput(inputId = "plot4_x",
                                                                 label = "X Axis",
                                                                 choices = numvar_options[-1],
-                                                                selected = numvar_options[2]),
+                                                                selected = "Total cycles"),
                                                  selectizeInput(inputId = "plot4_y",
                                                                 label = "Y Axis",
                                                                 choices = numvar_options[-1],
-                                                                selected = numvar_options[3]),
+                                                                selected = "Deliveries"),
                                                  selectizeInput(inputId = "plot4_color",
                                                                 label = "Color By",
                                                                 choices = charvar_options,
-                                                                selected = charvar_options[1]),
+                                                                selected = "Gestational carrier services"),
                                                  checkboxInput(inputId = "plot4_lm",
                                                                label = "Include Linear Model?",
                                                                value = TRUE)
@@ -254,7 +254,44 @@ ui <- fluidPage(
                                           column(9, plotOutput("plot4"))
                                         )
                               ),
-                              nav_panel("Faceted Bar Chart"),
+                              nav_panel("Faceted Bar Chart",
+                                        fluidRow(
+                                          column(3, 
+                                                 selectizeInput(inputId = "plot5_x",
+                                                                label = "X Axis",
+                                                                choices = charvar_options,
+                                                                selected = "Year"),
+                                                 selectizeInput(inputId = "plot5_y",
+                                                                label = "Y Axis",
+                                                                choices = numvar_options,
+                                                                selected = "Pregnancies"),
+                                                 selectizeInput(inputId = "plot5_fill",
+                                                                label = "Color By",
+                                                                choices = charvar_options,
+                                                                selected = "Clinic Status"),
+                                                 selectizeInput(inputId = "plot5_facet",
+                                                                label = "Facet By",
+                                                                choices = charvar_options,
+                                                                selected = "Verified lab accreditation")
+                                          ),
+                                          conditionalPanel(
+                                            condition = paste0("input.plot5_x == input.plot5_fill"),
+                                            column(9, "Please select two different variables for the X Axis and Color By options.")
+                                          ),
+                                          conditionalPanel(
+                                            condition = paste0("input.plot5_x == input.plot5_facet"),
+                                            column(9, "Please select two different variables for the X Axis and Facet By options.")
+                                          ),
+                                          conditionalPanel(
+                                            condition = paste0("input.plot5_fill == input.plot5_facet"),
+                                            column(9, "Please select two different variables for the Color By and Facet By options.")
+                                          ),
+                                          conditionalPanel(
+                                            condition = paste0("input.plot5_x != input.plot5_fill"),
+                                            column(9, plotOutput("plot5"))
+                                          )
+                                        )
+                              ),
                               nav_panel("Map")
                             )
                             
@@ -507,6 +544,57 @@ server <- function(input, output, session) {
     if(input$plot4_lm == TRUE){
       g <- g + geom_smooth(method = lm)
     }
+    
+    return(g)
+  })
+  
+  # Plot 5: Faceted Bar Chart
+  output$plot5 <- renderPlot({
+    
+    if(input$plot5_y == "Number of Records (One Record Per Clinic Per Year)"){
+      df <- filterdata() |>
+        group_by(get(input$plot5_x), get(input$plot5_fill), get(input$plot5_facet)) |>
+        summarize(`Number of Records (One Record Per Clinic Per Year)` = n())
+    } 
+    
+    else if (input$plot5_y == "Ratio of Pregnancies to Total cycles"){
+      df <- filterdata() |>
+        group_by(get(input$plot5_x), get(input$plot5_fill), get(input$plot5_facet)) |>
+        summarize(numerator = sum(Pregnancies, na.rm = TRUE), denominator = sum(`Total cycles`, na.rm = TRUE)) |>
+        mutate(ratio = if_else((denominator > 0), numerator / denominator, NA)) |>
+        select(-c(numerator, denominator))
+    } 
+    
+    else if (input$plot5_y == "Ratio of Deliveries to Pregnancies"){
+      df <- filterdata() |>
+        group_by(get(input$plot5_x), get(input$plot5_fill), get(input$plot5_facet)) |>
+        summarize(numerator = sum(Deliveries, na.rm = TRUE), denominator = sum(Pregnancies, na.rm = TRUE)) |>
+        mutate(ratio = if_else((denominator > 0), numerator / denominator, NA)) |>
+        select(-c(numerator, denominator))
+    } 
+    
+    else if (input$plot5_y == "Ratio of Total infants born to Deliveries"){
+      df <- filterdata() |>
+        group_by(get(input$plot5_x), get(input$plot5_fill), get(input$plot5_facet)) |>
+        summarize(numerator = sum(`Total infants born`, na.rm = TRUE), denominator = sum(Deliveries, na.rm = TRUE)) |>
+        mutate(ratio = if_else((denominator > 0), numerator / denominator, NA)) |>
+        select(-c(numerator, denominator))
+    }
+    
+    else {
+      df <- filterdata() |>
+        group_by(get(input$plot5_x), get(input$plot5_fill), get(input$plot5_facet)) |>
+        summarize(sum = sum(get(input$plot5_y), na.rm = TRUE))
+    }
+    
+    colnames(df) <- c(input$plot5_x, input$plot5_fill, input$plot5_facet, input$plot5_y)
+    
+    g <- ggplot(data = df,
+                aes(x = get(input$plot5_x), y = get(input$plot5_y), fill = get(input$plot5_fill))) +
+      geom_col() +
+      facet_wrap(~ get(input$plot5_facet)) +
+      labs(x = input$plot5_x, y = input$plot5_y, fill = input$plot5_fill) +
+      labs(title = str_wrap(paste0(input$plot5_y," by ",input$plot5_x," and ",input$plot5_fill), width = 50))
     
     return(g)
   })
