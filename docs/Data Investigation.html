@@ -400,7 +400,7 @@ TOP01
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>CDC <span class="ot">&lt;-</span> longdata <span class="sc">|&gt;</span></span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(<span class="st">"SubTopicId"</span>)) <span class="sc">|&gt;</span></span>
 <span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> SubTopic, <span class="at">values_from =</span> Data_Value) <span class="sc">|&gt;</span></span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="st">`</span><span class="at">Total cycles</span><span class="st">`</span><span class="sc">:</span><span class="st">`</span><span class="at">Total infants born</span><span class="st">`</span>, as.numeric)) <span class="sc">|&gt;</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="st">`</span><span class="at">Total cycles</span><span class="st">`</span><span class="sc">:</span><span class="st">`</span><span class="at">Total infants born</span><span class="st">`</span>, as.integer)) <span class="sc">|&gt;</span></span>
 <span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="st">`</span><span class="at">Donor egg services</span><span class="st">`</span><span class="sc">:</span><span class="st">`</span><span class="at">Verified lab accreditation</span><span class="st">`</span>, as.factor)) <span class="sc">|&gt;</span></span>
 <span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="st">`</span><span class="at">Clinic Status</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">as.factor</span>(<span class="st">`</span><span class="at">Clinic Status</span><span class="st">`</span>)) <span class="sc">|&gt;</span></span>
 <span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Year =</span> <span class="fu">as.factor</span>(Year)) <span class="sc">|&gt;</span></span>
@@ -429,8 +429,8 @@ TOP01
 # ℹ 1,403 more rows
 # ℹ 18 more variables: City &lt;chr&gt;, `Zip Code` &lt;chr&gt;, Phone &lt;chr&gt;,
 #   `Clinic Status` &lt;fct&gt;, ClinicId &lt;dbl&gt;, Geolocation &lt;chr&gt;,
-#   `Total cycles` &lt;dbl&gt;, `Fertility preservation cycles` &lt;dbl&gt;,
-#   Pregnancies &lt;dbl&gt;, Deliveries &lt;dbl&gt;, `Total infants born` &lt;dbl&gt;,
+#   `Total cycles` &lt;int&gt;, `Fertility preservation cycles` &lt;int&gt;,
+#   Pregnancies &lt;int&gt;, Deliveries &lt;int&gt;, `Total infants born` &lt;int&gt;,
 #   `Donor egg services` &lt;fct&gt;, `Donated embryo services` &lt;fct&gt;,
 #   `Embryo cryopreservation services` &lt;fct&gt;, …</code></pre>
 </div>
@@ -439,7 +439,7 @@ TOP01
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 1,413 × 5
    `Total cycles` `Fertility preservation cycles` Pregnancies Deliveries
-            &lt;dbl&gt;                           &lt;dbl&gt;       &lt;dbl&gt;      &lt;dbl&gt;
+            &lt;int&gt;                           &lt;int&gt;       &lt;int&gt;      &lt;int&gt;
  1            376                              11         107         86
  2            420                              NA         123         97
  3            169                               9          33         24
@@ -451,7 +451,7 @@ TOP01
  9           2010                             148         522        446
 10             44                              NA          24         19
 # ℹ 1,403 more rows
-# ℹ 1 more variable: `Total infants born` &lt;dbl&gt;</code></pre>
+# ℹ 1 more variable: `Total infants born` &lt;int&gt;</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>CDC <span class="sc">|&gt;</span></span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="st">`</span><span class="at">Donor egg services</span><span class="st">`</span><span class="sc">:</span><span class="st">`</span><span class="at">Verified lab accreditation</span><span class="st">`</span>) <span class="co">#for testing</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -490,11 +490,11 @@ TOP01
  $ Clinic Status                   : Factor w/ 4 levels "Closed","Non-reporter",..: 3 3 3 3 4 4 3 3 3 3 ...
  $ ClinicId                        : num [1:1413] 383 96 150 507 289 844 356 112 54 493 ...
  $ Geolocation                     : chr [1:1413] "POINT (-82.7074751 28.0103991)" "POINT (-122.1893912 47.6244604)" "POINT (-104.9344136 39.7327454)" "POINT (-73.7675463 42.697359)" ...
- $ Total cycles                    : num [1:1413] 376 420 169 740 140 31 71 354 2010 44 ...
- $ Fertility preservation cycles   : num [1:1413] 11 NA 9 19 NA 0 0 13 148 NA ...
- $ Pregnancies                     : num [1:1413] 107 123 33 184 47 NA 22 105 522 24 ...
- $ Deliveries                      : num [1:1413] 86 97 24 159 35 NA 20 93 446 19 ...
- $ Total infants born              : num [1:1413] 94 98 27 167 38 NA 22 94 453 26 ...
+ $ Total cycles                    : int [1:1413] 376 420 169 740 140 31 71 354 2010 44 ...
+ $ Fertility preservation cycles   : int [1:1413] 11 NA 9 19 NA 0 0 13 148 NA ...
+ $ Pregnancies                     : int [1:1413] 107 123 33 184 47 NA 22 105 522 24 ...
+ $ Deliveries                      : int [1:1413] 86 97 24 159 35 NA 20 93 446 19 ...
+ $ Total infants born              : int [1:1413] 94 98 27 167 38 NA 22 94 453 26 ...
  $ Donor egg services              : Factor w/ 2 levels "No","Yes": 2 2 2 1 1 1 2 2 2 2 ...
  $ Donated embryo services         : Factor w/ 2 levels "No","Yes": 1 2 2 1 1 1 2 1 1 1 ...
  $ Embryo cryopreservation services: Factor w/ 1 level "Yes": 1 1 1 1 1 1 1 1 1 1 ...
@@ -584,7 +584,7 @@ TOP01
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 3 × 6
   Gestational carrier serv…¹   Sum Mean (Per Clinic Per…² Median (Per Clinic P…³
-  &lt;fct&gt;                      &lt;dbl&gt;                  &lt;dbl&gt;                  &lt;dbl&gt;
+  &lt;fct&gt;                      &lt;int&gt;                  &lt;dbl&gt;                  &lt;dbl&gt;
 1 No                          2706                   62.9                    42 
 2 Yes                        95563                  235.                    134.
 3 &lt;NA&gt;                           0                  NaN                      NA 

@@ -102,7 +102,7 @@ Convert variables to numeric or factors, give variables nice names, and store re
 CDC <- longdata |>
   select(-c("SubTopicId")) |>
   pivot_wider(names_from = SubTopic, values_from = Data_Value) |>
-  mutate(across(`Total cycles`:`Total infants born`, as.numeric)) |>
+  mutate(across(`Total cycles`:`Total infants born`, as.integer)) |>
   mutate(across(`Donor egg services`:`Verified lab accreditation`, as.factor)) |>
   mutate(`Clinic Status` = as.factor(`Clinic Status`)) |>
   mutate(Year = as.factor(Year)) |>
