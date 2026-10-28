@@ -5,6 +5,8 @@ library(tidyverse)
 library(dplyr)
 library(bslib)
 library(ggplot2)
+library(usmap)
+library(shinycssloaders)
 
 # Bring in data needed for this app
 CDC <- readRDS("data/Cleaned CDC data.rds")
@@ -125,7 +127,7 @@ ui <- fluidPage(
                  downloadButton(outputId = "download",
                                 label = "Download CSV"),
                  br(), br(),
-                 DT::dataTableOutput(outputId = "filtered_data")
+                 withSpinner(DT::dataTableOutput(outputId = "filtered_data"))
                  ),
         tabPanel("Data Exploration",
                  tabsetPanel(
@@ -149,11 +151,11 @@ ui <- fluidPage(
                             ),
                             h4("One-Way Contingency Tables"),
                             fluidRow(
-                            column(6, tableOutput("contingencytable1")),
-                            column(6, tableOutput("contingencytable2"))
+                            column(6, withSpinner(tableOutput("contingencytable1"))),
+                            column(6, withSpinner(tableOutput("contingencytable2")))
                             ),
                             h4("Two-Way Contingency Table"),
-                            tableOutput("contingencytable1and2")
+                            withSpinner(tableOutput("contingencytable1and2"))
                             ),
                    
                    tabPanel("Numeric Data Summaries",
@@ -169,7 +171,7 @@ ui <- fluidPage(
                                     selected = numvar_options[1])),
                             ),
                             h4("Summary"),
-                            tableOutput("numeric_summary")
+                            withSpinner(tableOutput("numeric_summary"))
                             ),
                    
                    tabPanel("Plots",
@@ -198,7 +200,7 @@ ui <- fluidPage(
                                                  ),
                                                  conditionalPanel(
                                                    condition = paste0("input.plot1_x != input.plot1_fill"),
-                                                   column(9, plotOutput("plot1"))
+                                                   column(9, withSpinner(plotOutput("plot1")))
                                                  )
                                                )
                               ),
@@ -214,7 +216,7 @@ ui <- fluidPage(
                                                                 choices = charvar_options,
                                                                 selected = "Gestatioinal carrier services")
                                                  ),
-                                          column(9, plotOutput("plot2"))
+                                          column(9, withSpinner(plotOutput("plot2")))
                                         )
                               ),
                               nav_panel("Box Plot",
@@ -229,7 +231,7 @@ ui <- fluidPage(
                                                                 choices = numvar_options[-1],
                                                                 selected = "Pregnancies")
                                           ),
-                                          column(9, plotOutput("plot3"))
+                                          column(9, withSpinner(plotOutput("plot3")))
                                          )
                               ),
                               nav_panel("Scatter Plot",
@@ -251,7 +253,7 @@ ui <- fluidPage(
                                                                label = "Include Linear Model?",
                                                                value = TRUE)
                                                  ),
-                                          column(9, plotOutput("plot4"))
+                                          column(9, withSpinner(plotOutput("plot4")))
                                         )
                               ),
                               nav_panel("Faceted Bar Chart",
@@ -287,12 +289,22 @@ ui <- fluidPage(
                                             column(9, "Please select two different variables for the Color By and Facet By options.")
                                           ),
                                           conditionalPanel(
-                                            condition = paste0("input.plot5_x != input.plot5_fill"),
-                                            column(9, plotOutput("plot5"))
+                                            condition = paste0("input.plot5_x != input.plot5_fill & input.plot5_x != input.plot5_facet & input.plot5_fill != input.plot5_facet"),
+                                            column(9, withSpinner(plotOutput("plot5")))
                                           )
                                         )
                               ),
-                              nav_panel("Map")
+                              nav_panel("Map",
+                                        fluidRow(
+                                          column(3,
+                                                 selectizeInput(inputId = "plot6_variable",
+                                                                label = "Variable",
+                                                                choices = numvar_options,
+                                                                selected = "Pregnancies"),
+                                                 ),
+                                          column(9, withSpinner(plotOutput("plot6")))
+                                        )
+                              )
                             )
                             
                              
@@ -595,6 +607,52 @@ server <- function(input, output, session) {
       facet_wrap(~ get(input$plot5_facet)) +
       labs(x = input$plot5_x, y = input$plot5_y, fill = input$plot5_fill) +
       labs(title = str_wrap(paste0(input$plot5_y," by ",input$plot5_x," and ",input$plot5_fill), width = 50))
+    
+    return(g)
+  })
+  
+  output$plot6 <- renderPlot({
+    
+    df <- filterdata() |>
+      mutate(`Number of Records (One Record Per Clinic Per Year)` = as.integer(1)) |>
+      rename(state = State)
+    
+    if (input$plot6_variable == "Ratio of Pregnancies to Total cycles"){
+      df <- df |>
+        group_by(state) |>
+        summarize(numerator = sum(Pregnancies, na.rm = TRUE), denominator = sum(`Total cycles`, na.rm = TRUE)) |>
+        mutate(mapvalue = if_else((denominator > 0), numerator / denominator, NA)) |>
+        select(-c(numerator, denominator))
+    } 
+    
+    else if (input$plot6_variable == "Ratio of Deliveries to Pregnancies"){
+      df <- df |>
+        group_by(state) |>
+        summarize(numerator = sum(Deliveries, na.rm = TRUE), denominator = sum(Pregnancies, na.rm = TRUE)) |>
+        mutate(mapvalue = if_else((denominator > 0), numerator / denominator, NA)) |>
+        select(-c(numerator, denominator))
+    } 
+    
+    else if (input$plot6_variable == "Ratio of Total infants born to Deliveries"){
+      df <- df |>
+        group_by(state) |>
+        summarize(numerator = sum(`Total infants born`, na.rm = TRUE), denominator = sum(Deliveries, na.rm = TRUE)) |>
+        mutate(mapvalue = if_else((denominator > 0), numerator / denominator, NA)) |>
+        select(-c(numerator, denominator))
+    }
+    
+    else {
+      df <- df |>
+        filter(!is.na(get(input$plot6_variable))) |>
+        group_by(state) |>
+        summarize(mapvalue = sum(get(input$plot6_variable), na.rm = TRUE))
+    }
+      
+    g <- plot_usmap(data = df,
+               values = "mapvalue",
+               regions = "states") +
+      scale_fill_continuous(low = "white", high = "red", name = input$plot6_variable) +
+      labs(title = str_wrap(paste0(input$plot6_variable, " by State"), width = 50))
     
     return(g)
   })
