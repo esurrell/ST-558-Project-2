@@ -232,7 +232,28 @@ ui <- fluidPage(
                                           column(9, plotOutput("plot3"))
                                          )
                               ),
-                              nav_panel("Scatter Plot"),
+                              nav_panel("Scatter Plot",
+                                        fluidRow(
+                                          column(3,
+                                                 selectizeInput(inputId = "plot4_x",
+                                                                label = "X Axis",
+                                                                choices = numvar_options[-1],
+                                                                selected = numvar_options[2]),
+                                                 selectizeInput(inputId = "plot4_y",
+                                                                label = "Y Axis",
+                                                                choices = numvar_options[-1],
+                                                                selected = numvar_options[3]),
+                                                 selectizeInput(inputId = "plot4_color",
+                                                                label = "Color By",
+                                                                choices = charvar_options,
+                                                                selected = charvar_options[1]),
+                                                 checkboxInput(inputId = "plot4_lm",
+                                                               label = "Include Linear Model?",
+                                                               value = TRUE)
+                                                 ),
+                                          column(9, plotOutput("plot4"))
+                                        )
+                              ),
                               nav_panel("Faceted Bar Chart"),
                               nav_panel("Map")
                             )
@@ -440,7 +461,7 @@ server <- function(input, output, session) {
   # Plot 2: Smoothed Histogram
   output$plot2 <- renderPlot({
     
-      df <- filterdata()
+      df <- filterdata() |> filter(!(is.na(get(input$plot2_x))))
     
       g <- ggplot(df) +
         geom_density(aes(x = get(input$plot2_x), color = get(input$plot2_color))) +
@@ -453,7 +474,7 @@ server <- function(input, output, session) {
   # Plot 3: Box Plot
   output$plot3 <- renderPlot({
     
-    df <- filterdata()
+    df <- filterdata() |> filter(!(is.na(get(input$plot3_y))))
     
     g <- ggplot(df,
                 aes(x = get(input$plot3_x),
@@ -462,6 +483,30 @@ server <- function(input, output, session) {
       geom_boxplot() +
       labs(x = input$plot3_x, y = input$plot3_y, fill = input$plot3_x) +
       labs(title = str_wrap(paste0(input$plot3_y," by ", input$plot3_x), width = 50))
+    
+    return(g)
+  })
+  
+  # Plot 4: Scatter Plot
+  output$plot4 <- renderPlot({
+    
+    df <- filterdata() |>
+      filter(!(is.na(get(input$plot4_x)))) |> 
+      filter(!(is.na(get(input$plot4_y))))
+    
+    g <- ggplot(df,
+                aes(x = get(input$plot4_x),
+                    y = get(input$plot4_y),
+                    color = get(input$plot4_color))) +
+      geom_point() +
+      labs(x = input$plot4_x, y = input$plot4_y, color = input$plot4_color) +
+      labs(title = str_wrap(paste0(input$plot4_y,
+                                   " and ", input$plot4_x,
+                                   " by ", input$plot4_color), width = 50))
+    
+    if(input$plot4_lm == TRUE){
+      g <- g + geom_smooth(method = lm)
+    }
     
     return(g)
   })
