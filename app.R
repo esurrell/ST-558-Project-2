@@ -4,6 +4,7 @@ library(DT)
 library(tidyverse)
 library(dplyr)
 library(bslib)
+library(ggplot2)
 
 # Bring in data needed for this app
 CDC <- readRDS("data/Cleaned CDC data.rds")
@@ -70,7 +71,7 @@ ui <- fluidPage(
   sidebarLayout(
     sidebarPanel(
       
-      width = 2,
+      width = 3,
       
       fluidRow(
         column(6, h4("Filter Criteria:")),
@@ -115,7 +116,7 @@ ui <- fluidPage(
     
     mainPanel(
       
-      width = 10,
+      width = 9,
       
       tabsetPanel(
         tabPanel("About"),
@@ -201,8 +202,36 @@ ui <- fluidPage(
                                                  )
                                                )
                               ),
-                              nav_panel("Smoothed Histogram"),
-                              nav_panel("Box Plot"),
+                              nav_panel("Smoothed Histogram",
+                                        fluidRow(
+                                          column(3,
+                                                 selectizeInput(inputId = "plot2_x",
+                                                                label = "X Axis",
+                                                                choices = numvar_options[-1],
+                                                                selected = numvar_options[2]),
+                                                 selectizeInput(inputId = "plot2_color",
+                                                                label = "Color By",
+                                                                choices = charvar_options,
+                                                                selected = charvar_options[1])
+                                                 ),
+                                          column(9, plotOutput("plot2"))
+                                        )
+                              ),
+                              nav_panel("Box Plot",
+                                        fluidRow(
+                                          column(3,
+                                                 selectizeInput(inputId = "plot3_x",
+                                                                label = "X Axis",
+                                                                choices = charvar_options,
+                                                                selected = charvar_options[1]),
+                                                 selectizeInput(inputId = "plot3_y",
+                                                                label = "Y Axis",
+                                                                choices = numvar_options[-1],
+                                                                selected = numvar_options[2])
+                                          ),
+                                          column(9, plotOutput("plot3"))
+                                         )
+                              ),
                               nav_panel("Scatter Plot"),
                               nav_panel("Faceted Bar Chart"),
                               nav_panel("Map")
@@ -338,10 +367,7 @@ server <- function(input, output, session) {
   # Numeric summary
   output$numeric_summary <- renderTable({
     df <- filterdata() |>
-      mutate(`Number of Records (One Record Per Clinic Per Year)` = 1,
-             `Ratio of Pregnancies to Total cycles` = if_else((`Total cycles` > 0), Pregnancies / `Total cycles`, NA),
-             `Ratio of Deliveries to Pregnancies` = if_else((Pregnancies > 0), Deliveries / Pregnancies, NA),
-             `Ratio of Total infants born to Deliveries` = if_else((Deliveries > 0), `Total infants born` / Deliveries, NA)) |>
+      mutate(`Number of Records (One Record Per Clinic Per Year)` = as.integer(1)) |>
       group_by(get(input$numericsummary1)) |>
       summarize(Sum = sum(get(input$numericsummary2), na.rm = TRUE),
                 `Mean (Per Clinic Per Year)` = mean(get(input$numericsummary2), na.rm = TRUE),
@@ -361,7 +387,7 @@ server <- function(input, output, session) {
     return(df)
   })
   
-  #Plot 1
+  # Plot 1: Bar Chart
   output$plot1 <- renderPlot({
     
     if(input$plot1_y == "Number of Records (One Record Per Clinic Per Year)"){
@@ -407,6 +433,35 @@ server <- function(input, output, session) {
       geom_col() +
       labs(x = input$plot1_x, y = input$plot1_y, fill = input$plot1_fill) +
       labs(title = str_wrap(paste0(input$plot1_y," by ",input$plot1_x," and ",input$plot1_fill), width = 50))
+    
+    return(g)
+  })
+  
+  # Plot 2: Smoothed Histogram
+  output$plot2 <- renderPlot({
+    
+      df <- filterdata()
+    
+      g <- ggplot(df) +
+        geom_density(aes(x = get(input$plot2_x), color = get(input$plot2_color))) +
+        labs(x = input$plot2_x, color = input$plot2_color) +
+        labs(title = str_wrap(paste0("Density of ", input$plot2_x ," by ", input$plot2_color), width = 50))
+  
+      return(g)    
+    })
+  
+  # Plot 3: Box Plot
+  output$plot3 <- renderPlot({
+    
+    df <- filterdata()
+    
+    g <- ggplot(df,
+                aes(x = get(input$plot3_x),
+                    y = get(input$plot3_y),
+                    fill = get(input$plot3_x))) +
+      geom_boxplot() +
+      labs(x = input$plot3_x, y = input$plot3_y, fill = input$plot3_x) +
+      labs(title = str_wrap(paste0(input$plot3_y," by ", input$plot3_x), width = 50))
     
     return(g)
   })

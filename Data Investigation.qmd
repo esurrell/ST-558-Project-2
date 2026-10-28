@@ -96,7 +96,7 @@ longdata |>
   pivot_wider(names_from = SubTopic, values_from = Data_Value)
 ```
 
-Convert variables to numeric or factors, give variables nice names, and store results.
+Convert variables to numeric or factors, give variables nice names, compute a few additional variables, and store results.
 
 ```{r}
 CDC <- longdata |>
@@ -110,7 +110,16 @@ CDC <- longdata |>
           State = LocationDesc,
           `Facility Name` = FacilityName,
           `Medical Director` = MedicalDirector,
-          `Zip Code` = Zipcode)
+          `Zip Code` = Zipcode) |>
+  mutate(`Ratio of Pregnancies to Total cycles` = 
+           if_else((`Total cycles` > 0), 
+                   Pregnancies / `Total cycles`, NA),
+         `Ratio of Deliveries to Pregnancies` = 
+           if_else((Pregnancies > 0),
+                   Deliveries / Pregnancies, NA),
+         `Ratio of Total infants born to Deliveries` = 
+           if_else((Deliveries > 0),
+                   `Total infants born` / Deliveries, NA))
 
 #view results
 CDC
@@ -196,8 +205,8 @@ ggplot(data = CDC,
 ggplot(data = CDC |>
          filter(Year == 2022, Pregnancies < 1500) |>
          drop_na(Pregnancies)) +
-  geom_density(aes(alpha = 0.5, x = Pregnancies,
-                   fill = `Gestational carrier services`)) +
+  geom_density(aes(x = Pregnancies,
+                   color = `Gestational carrier services`)) +
   labs(title = str_wrap("Density of Pregnancies by Gestational carrier services", width = 50))
 ```
 
