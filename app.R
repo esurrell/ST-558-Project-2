@@ -121,7 +121,32 @@ ui <- fluidPage(
       width = 9,
       
       tabsetPanel(
-        tabPanel("About"),
+        tabPanel("About",
+                 br(),
+                 "Use this app to analyze and download cleaned CDC data about Assisted Reproductive Technology (ART). This data provides information about fertility clinics across the United States in the years 2020-2022. Links to each year of the raw data are provided below:",
+                 br(), br(),
+                 tags$ul(
+                     tags$li(tags$a(href = "https://data.cdc.gov/Assisted-Reproductive-Technology-ART-/2020-Final-Assisted-Reproductive-Technology-ART-Se/92ri-yjps/about_data", target = "_blank", "2020 Data")),
+                     tags$li(tags$a(href = "https://data.cdc.gov/Assisted-Reproductive-Technology-ART-/2021-Final-Assisted-Reproductive-Technology-ART-Se/ui6g-vumy/about_data", target = "_blank", "2021 Data")),
+                     tags$li(tags$a(href = "https://data.cdc.gov/Assisted-Reproductive-Technology-ART-/2022-Final-Assisted-Reproductive-Technology-ART-Se/ix4g-rt8v/about_data", target = "_blank", "2022 Data"))
+                  ),
+                 
+                 "This data has been cleaned and does not look exactly like its raw form. Some data cleaning that has been performed includes combining the three years of data into a single data set, removing summary rows, variable formatting, and calculating ratios. The final data set contains one row of data per fertility clinic per year.",
+                br(), br(),
+                'To filter the data, use the panel to the left to make your selections and then click the "Apply Filters" button. The data will not filter until you click this button.',
+                 br(), br(),
+                 'To download data, set your filters and then proceed to the "Data Download" tab.',
+                 br(), br(),
+                 'Summary tables and plots are available on the "Data Exploration" tab. This includes:',
+                br(), br(),
+                tags$ul(
+                  tags$li("One and two-way contingency tables, which provide counts of clinics and data records by categories of your choosing;"),
+                  tags$li("Numeric Data Summaries, which provide statistical measures of a numerical variable of your choosing by a categorical variable of your choosing; and"),
+                  tags$li("Plots. There are 6 types of plots available, and each of them allows you to select your variable(s) of interest.")
+                  ),
+                br(),
+                imageOutput("image")
+                ),
         tabPanel("Data Download",
                  br(),
                  downloadButton(outputId = "download",
@@ -655,6 +680,11 @@ server <- function(input, output, session) {
       labs(title = str_wrap(paste0(input$plot6_variable, " by State"), width = 50))
     
     return(g)
+  })
+  
+  # image for About tab
+  output$image <- renderImage({
+    list(src = "data/Logo.jpg", width = 400, alt = "Image of Logo of Data.CDC.gov website")
   })
   
 }
