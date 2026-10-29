@@ -635,7 +635,7 @@ server <- function(input, output, session) {
       geom_col() +
       facet_wrap(~ get(input$plot5_facet)) +
       labs(x = input$plot5_x, y = input$plot5_y, fill = input$plot5_fill) +
-      labs(title = str_wrap(paste0(input$plot5_y," by ",input$plot5_x," and ",input$plot5_fill), width = 50))
+      labs(title = str_wrap(paste0(input$plot5_y," by ",input$plot5_x,", ",input$plot5_fill,", and ", input$plot5_facet), width = 50))
     
     return(g)
   })
