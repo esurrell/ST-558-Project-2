@@ -64,6 +64,10 @@ charvar_options <- c('Year',
                      'SART member',
                      'Verified lab accreditation')
 
+# Chart Theme options
+set_theme(theme_light())
+update_theme(plot.title = element_text(hjust = 0.5))
+
 # Define UI
 ui <- fluidPage(
   
@@ -685,7 +689,7 @@ server <- function(input, output, session) {
   # image for About tab
   output$image <- renderImage({
     list(src = "data/Logo.jpg", width = 400, alt = "Image of Logo of Data.CDC.gov website")
-  })
+  }, deleteFile=TRUE)
   
 }
 
