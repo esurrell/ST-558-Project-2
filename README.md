@@ -24,4 +24,4 @@ Summary tables and plots are available on the "Data Exploration" tab. This inclu
 - Numeric Data Summaries, which provide statistical measures of a numerical variable of your choosing by a categorical variable of your choosing; and
 - Plots. There are 6 types of plots available, and each of them allows you to select your variable(s) of interest.
 
-![Image of Logo of Data.CDC.gov website](data/Logo.jpg)
+![Image of Logo of Data.CDC.gov website](data/Logo.jpg){width="400"}
