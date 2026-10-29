@@ -4,6 +4,9 @@
 
 This repository creates an app about U.S. fertility clinics using R and Shiny.
 
+The app can be accessed here:
+[https://esurrell.shinyapps.io/st-558-project-2/](https://esurrell.shinyapps.io/st-558-project-2/)
+
 ### About the App
 
 Use this app to analyze and download cleaned CDC data about Assisted Reproductive Technology (ART). This data provides information about fertility clinics across the United States in the years 2020-2022. Links to each year of the raw data are provided below:
