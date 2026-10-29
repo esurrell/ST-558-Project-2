@@ -689,7 +689,7 @@ server <- function(input, output, session) {
   # image for About tab
   output$image <- renderImage({
     list(src = "data/Logo.jpg", width = 400, alt = "Image of Logo of Data.CDC.gov website")
-  }, deleteFile=TRUE)
+  }, deleteFile=FALSE)
   
 }
 
